@@ -20,8 +20,25 @@ const STATUS_CLASSES={
   "Cancelado":"status-cancelado"
 };
 let idBuscaAtual="";
+let timerToast=null;
 
-function mensagem(txt,erro=false){$("mensagem").textContent=txt;$("mensagem").style.color=erro?"#b42318":"#1769aa";}
+function fecharMensagem(){
+  clearTimeout(timerToast);
+  timerToast=null;
+  $("mensagem").hidden=true;
+}
+
+function mensagem(txt,erro=false){
+  const toast=$("mensagem");
+  clearTimeout(timerToast);
+  $("mensagemTexto").textContent=txt;
+  toast.classList.toggle("erro",erro);
+  toast.hidden=false;
+  toast.classList.remove("animando");
+  void toast.offsetWidth;
+  toast.classList.add("animando");
+  timerToast=setTimeout(fecharMensagem,erro?5500:3800);
+}
 function linhaVazia(colunas,txt){return `<tr><td colspan="${colunas}" class="vazio">${txt}</td></tr>`;}
 function tagPrioridade(prioridade){
   const n=Number(prioridade);
@@ -162,6 +179,7 @@ $("btnLimparBusca").addEventListener("click",()=>{
   $("buscaIdPaciente").value="";
   renderizarBusca();
 });
+$("btnFecharToast").addEventListener("click",fecharMensagem);
 $("formMedico").addEventListener("submit",e=>{
   e.preventDefault();
   try{

@@ -144,7 +144,10 @@
         </section>
       </div>
     </section>
-    <p id="mensagem" class="mensagem" role="status"></p>
+    <div id="mensagem" class="toast" role="status" aria-live="polite" hidden>
+      <span id="mensagemTexto"></span>
+      <button type="button" id="btnFecharToast" class="toast-fechar" aria-label="Fechar notificação">&times;</button>
+    </div>
   </main>
   <script type="module" src="js/app.js"></script>
 </body>
