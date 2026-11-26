@@ -1,5 +1,6 @@
 import {servicoPacientes} from "./services/pacientes.js";
 import {servicoAtendimentos} from "./services/atendimentos.js";
+import {salvarEstado,carregarEstado,limparEstado} from "./storage.js";
 
 const $=id=>document.getElementById(id);
 const dataHora=valor=>new Date(valor).toLocaleString("pt-BR");
@@ -63,6 +64,7 @@ $("formPaciente").addEventListener("submit",e=>{
   e.preventDefault();
   try{
     const p=servicoPacientes.cadastrar_paciente($("nomePaciente").value,$("idadePaciente").value,$("prioridadePaciente").value);
+    salvarEstado(servicoPacientes,servicoAtendimentos);
     e.target.reset();$("prioridadePaciente").value="3";renderizar();mensagem(`Paciente ${p.nome} cadastrado com ID ${p.id}.`);
   }catch(err){mensagem(err.message,true);}
 });
@@ -80,18 +82,30 @@ $("formMedico").addEventListener("submit",e=>{
   e.preventDefault();
   try{
     const m=servicoAtendimentos.cadastrar_medico($("nomeMedico").value);
+    salvarEstado(servicoPacientes,servicoAtendimentos);
     e.target.reset();renderizar();mensagem(`Médico(a) ${m.nome} cadastrado(a) com ID ${m.id}.`);
   }catch(err){mensagem(err.message,true);}
 });
 $("btnChamar").addEventListener("click",()=>{
-  try{const a=servicoAtendimentos.chamar_proximo();renderizar();mensagem(`${a.paciente.nome} chamado(a) pelo(a) Dr(a). ${a.medico.nome}.`);}
+  try{const a=servicoAtendimentos.chamar_proximo();salvarEstado(servicoPacientes,servicoAtendimentos);renderizar();mensagem(`${a.paciente.nome} chamado(a) pelo(a) Dr(a). ${a.medico.nome}.`);}
   catch(err){mensagem(err.message,true);}
+});
+$("btnResetar").addEventListener("click",()=>{
+  if(!window.confirm("Deseja limpar todos os cadastros e atendimentos e restaurar os médicos iniciais?"))return;
+  servicoAtendimentos.resetar();
+  servicoPacientes.resetar();
+  limparEstado();
+  idBuscaAtual="";
+  $("buscaIdPaciente").value="";
+  renderizar();
+  mensagem("Demonstração reiniciada com sucesso.");
 });
 document.addEventListener("change",e=>{
   const reclassificar=e.target.closest("[data-reclassificar]");
   if(!reclassificar)return;
   try{
     const p=servicoPacientes.reclassificar_paciente(reclassificar.dataset.reclassificar,reclassificar.value);
+    salvarEstado(servicoPacientes,servicoAtendimentos);
     renderizar();mensagem(`Prioridade de ${p.nome} alterada para ${p.prioridade}.`);
   }catch(err){renderizar();mensagem(err.message,true);}
 });
@@ -100,9 +114,10 @@ document.addEventListener("click",e=>{
   const concluir=e.target.closest("[data-concluir]");
   const toggleMedico=e.target.closest("[data-toggle-medico]");
   try{
-    if(cancelar){const p=servicoPacientes.cancelar_paciente(cancelar.dataset.cancelar);renderizar();mensagem(`Cadastro de ${p.nome} cancelado.`);}
-    if(concluir){const a=servicoAtendimentos.concluir_atendimento(concluir.dataset.concluir);renderizar();mensagem(`Atendimento de ${a.paciente.nome} concluído.`);}
-    if(toggleMedico){const m=servicoAtendimentos.alternar_disponibilidade_medico(toggleMedico.dataset.toggleMedico);renderizar();mensagem(`Dr(a). ${m.nome} agora está ${m.disponivel?"disponível":"ausente"}.`);}
+    if(cancelar){const p=servicoPacientes.cancelar_paciente(cancelar.dataset.cancelar);salvarEstado(servicoPacientes,servicoAtendimentos);renderizar();mensagem(`Cadastro de ${p.nome} cancelado.`);}
+    if(concluir){const a=servicoAtendimentos.concluir_atendimento(concluir.dataset.concluir);salvarEstado(servicoPacientes,servicoAtendimentos);renderizar();mensagem(`Atendimento de ${a.paciente.nome} concluído.`);}
+    if(toggleMedico){const m=servicoAtendimentos.alternar_disponibilidade_medico(toggleMedico.dataset.toggleMedico);salvarEstado(servicoPacientes,servicoAtendimentos);renderizar();mensagem(`Dr(a). ${m.nome} agora está ${m.disponivel?"disponível":"ausente"}.`);}
   }catch(err){mensagem(err.message,true);}
 });
+carregarEstado(servicoPacientes,servicoAtendimentos);
 renderizar();

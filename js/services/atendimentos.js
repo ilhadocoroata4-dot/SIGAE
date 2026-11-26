@@ -56,5 +56,55 @@ export class ServicoAtendimentos {
   }
   listar_em_andamento(){return [...this.emAndamento.values()];}
   listar_historico(){return [...this.historico];}
+  exportar_estado(){
+    return {
+      proximoAtendimento:this.proximoAtendimento,
+      proximoMedicoId:this.proximoMedicoId,
+      medicos:this.heapMedicos.listar_todos().map(m=>({...m})),
+      emAndamento:this.listar_em_andamento().map(a=>({
+        id:a.id,
+        pacienteId:String(a.paciente.id),
+        medicoId:String(a.medico.id),
+        data_inicio:a.data_inicio,
+        status:a.status
+      })),
+      historico:this.historico.map(a=>({...a,paciente:{...a.paciente},medico:{...a.medico}}))
+    };
+  }
+  restaurar_estado(estado,servicoPac=servicoPacientes){
+    this.heapMedicos.limpar();this.emAndamento.clear();this.historico=[];
+    const medicos=Array.isArray(estado?.medicos)&&estado.medicos.length?estado.medicos:null;
+    if(medicos){
+      for(const m of medicos)this.heapMedicos.inserir({...m});
+    }else{
+      this._inserirMedicosPadrao();
+    }
+    let maxAtendimento=0;
+    if(Array.isArray(estado?.emAndamento)){
+      for(const item of estado.emAndamento){
+        const paciente=servicoPac.consultar_paciente(item.pacienteId);
+        const medico=this.heapMedicos.buscar(item.medicoId);
+        if(!paciente||!medico)continue;
+        const id=Number(item.id);
+        this.emAndamento.set(id,{id,paciente,medico,data_inicio:item.data_inicio,status:item.status||"Em andamento"});
+        if(Number.isInteger(id))maxAtendimento=Math.max(maxAtendimento,id);
+      }
+    }
+    if(Array.isArray(estado?.historico)){
+      this.historico=estado.historico.map(a=>{
+        const id=Number(a.id);
+        if(Number.isInteger(id))maxAtendimento=Math.max(maxAtendimento,id);
+        return {...a,paciente:{...a.paciente},medico:{...a.medico}};
+      });
+    }
+    const proxAt=Number(estado?.proximoAtendimento);
+    this.proximoAtendimento=Math.max(Number.isInteger(proxAt)&&proxAt>0?proxAt:1,maxAtendimento+1);
+    const proxMed=Number(estado?.proximoMedicoId);
+    this.proximoMedicoId=Number.isInteger(proxMed)&&proxMed>0?proxMed:105;
+  }
+  resetar(){
+    this.heapMedicos.limpar();this.emAndamento.clear();this.historico=[];this.proximoAtendimento=1;this.proximoMedicoId=105;
+    this._inserirMedicosPadrao();
+  }
 }
 export const servicoAtendimentos=new ServicoAtendimentos();

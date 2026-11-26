@@ -9,13 +9,14 @@
 Não abra o HTML por `file://`, pois os módulos JavaScript ES Modules precisam ser servidos por HTTP local.
 
 ## Estrutura
-- `js/estruturas/`: Árvore Rubro-Negra, Heap de Pacientes, Tabela Hash e Heap de Médicos.
-- `js/services/`: regras de cadastro e atendimento.
+- `js/estruturas/`: Árvore Rubro-Negra, Heap de Pacientes, Tabela Hash e Heap de Médicos (JS puro, sem dependência de DOM).
+- `js/services/`: regras de cadastro e atendimento (JS puro, reutilizável em Node.js/API futura).
+- `js/storage.js`: persistência local no navegador (`localStorage`).
 - `js/app.js`: interação com a interface.
 - `css/style.css`: aparência.
 
 ## Médicos pré-cadastrados
-Edite a lista no construtor de `js/services/atendimentos.js`.
+Edite a lista inicial em `js/services/atendimentos.js` ou cadastre novos médicos diretamente pela interface.
 
 ## Observação sobre os dados
-Esta versão mantém os dados em memória enquanto a página está aberta. Ao atualizar/recarregar a página, os cadastros e atendimentos são reiniciados. Não há banco de dados nem API.
+Esta versão salva o estado automaticamente no `localStorage` do navegador (com botão para limpar/resetar a demonstração na interface). Não há banco de dados nem API externa.
