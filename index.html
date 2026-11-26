@@ -25,50 +25,90 @@
       <article><span>Médicos disponíveis</span><strong id="totalMedicos">0</strong></article>
     </section>
 
-    <div class="area-distribuicao">
-      <div class="coluna-operacao">
-        <section class="painel">
-          <h2>Cadastrar paciente</h2>
-          <form id="formPaciente" class="form-grid">
-            <label>Nome<input id="nomePaciente" required maxlength="80"></label>
-            <label>Idade<input id="idadePaciente" type="number" min="0" max="120" required></label>
-            <label>Prioridade
-              <select id="prioridadePaciente" required>
-                <option value="1">1 - Emergência</option>
-                <option value="2">2 - Muito urgente</option>
-                <option value="3" selected>3 - Urgente</option>
-                <option value="4">4 - Pouco urgente</option>
-                <option value="5">5 - Não urgente</option>
-              </select>
-            </label>
-            <button type="submit">Cadastrar paciente</button>
-          </form>
-        </section>
+    <div class="grade-topo-operacao">
+      <section class="painel">
+        <h2>Cadastrar paciente</h2>
+        <form id="formPaciente" class="form-grid-compacto">
+          <label class="campo-largo">Nome<input id="nomePaciente" required maxlength="80"></label>
+          <label>Idade<input id="idadePaciente" type="number" min="0" max="120" required></label>
+          <label>Prioridade
+            <select id="prioridadePaciente" required>
+              <option value="1">1 - Emergência</option>
+              <option value="2">2 - Muito urgente</option>
+              <option value="3" selected>3 - Urgente</option>
+              <option value="4">4 - Pouco urgente</option>
+              <option value="5">5 - Não urgente</option>
+            </select>
+          </label>
+          <button type="submit" class="campo-largo">Cadastrar paciente</button>
+        </form>
+      </section>
 
-        <section class="painel">
-          <h2>Consultar paciente por ID (Tabela Hash)</h2>
-          <form id="formBuscaPaciente" class="form-linha">
-            <label>ID do paciente<input id="buscaIdPaciente" placeholder="Ex.: 1" required></label>
-            <button type="submit">Buscar</button>
-            <button type="button" id="btnLimparBusca" class="secundario">Limpar</button>
-          </form>
-          <div id="resultadoBusca" class="resultado-busca" aria-live="polite"></div>
-        </section>
+      <section class="painel">
+        <h2>Consultar paciente por ID (Tabela Hash)</h2>
+        <form id="formBuscaPaciente" class="form-linha">
+          <label>ID do paciente<input id="buscaIdPaciente" placeholder="Ex.: 1" required></label>
+          <button type="submit">Buscar</button>
+          <button type="button" id="btnLimparBusca" class="secundario">Limpar</button>
+        </form>
+        <div id="resultadoBusca" class="resultado-busca" aria-live="polite"></div>
+      </section>
+    </div>
 
-        <section class="painel">
-          <div class="linha-titulo">
-            <h2>Fila de prioridade</h2>
-            <button id="btnChamar" class="destaque">Chamar próximo paciente</button>
-          </div>
-          <div class="tabela-wrap">
-            <table>
-              <thead><tr><th>Ordem</th><th>ID</th><th>Paciente</th><th>Idade</th><th>Prioridade</th><th>Cadastro</th><th>Ação</th></tr></thead>
-              <tbody id="tabelaFila"><tr><td colspan="7" class="vazio">Nenhum paciente aguardando.</td></tr></tbody>
-            </table>
-          </div>
-        </section>
-      </div>
+    <nav class="abas" role="tablist" aria-label="Seções do sistema">
+      <button type="button" role="tab" id="tab-atendimento" class="aba ativa" data-aba="atendimento" aria-selected="true" aria-controls="painel-atendimento">
+        Atendimento / Fila <span class="aba-badge" id="badgeAbaAtendimento">0</span>
+      </button>
+      <button type="button" role="tab" id="tab-medicos" class="aba" data-aba="medicos" aria-selected="false" aria-controls="painel-medicos">
+        Médicos <span class="aba-badge" id="badgeAbaMedicos">0</span>
+      </button>
+      <button type="button" role="tab" id="tab-historico" class="aba" data-aba="historico" aria-selected="false" aria-controls="painel-historico">
+        Histórico &amp; Árvore <span class="aba-badge" id="badgeAbaHistorico">0</span>
+      </button>
+    </nav>
 
+    <section id="painel-atendimento" class="painel-aba" role="tabpanel" aria-labelledby="tab-atendimento" data-painel-aba="atendimento">
+      <section class="painel">
+        <div class="linha-titulo">
+          <h2>Fila de prioridade</h2>
+          <button id="btnChamar" class="destaque">Chamar próximo paciente</button>
+        </div>
+        <div class="tabela-wrap">
+          <table>
+            <thead><tr><th>Ordem</th><th>ID</th><th>Paciente</th><th>Idade</th><th>Prioridade</th><th>Cadastro</th><th>Ação</th></tr></thead>
+            <tbody id="tabelaFila"><tr><td colspan="7" class="vazio">Nenhum paciente aguardando.</td></tr></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="painel">
+        <h2>Atendimentos em andamento</h2>
+        <div class="tabela-wrap">
+          <table>
+            <thead><tr><th>Nº</th><th>Paciente</th><th>Médico</th><th>Início</th><th>Ação</th></tr></thead>
+            <tbody id="tabelaAndamento"><tr><td colspan="5" class="vazio">Nenhum atendimento em andamento.</td></tr></tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+
+    <section id="painel-medicos" class="painel-aba" role="tabpanel" aria-labelledby="tab-medicos" data-painel-aba="medicos" hidden>
+      <section class="painel">
+        <h2>Médicos cadastrados</h2>
+        <form id="formMedico" class="form-linha form-medico">
+          <label>Nome do médico<input id="nomeMedico" placeholder="Ex.: Dra. Beatriz" required maxlength="80"></label>
+          <button type="submit">Cadastrar médico</button>
+        </form>
+        <div class="tabela-wrap">
+          <table>
+            <thead><tr><th>ID</th><th>Médico</th><th>Atendimentos concluídos</th><th>Disponibilidade</th><th>Ação</th></tr></thead>
+            <tbody id="tabelaMedicos"></tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+
+    <section id="painel-historico" class="painel-aba" role="tabpanel" aria-labelledby="tab-historico" data-painel-aba="historico" hidden>
       <section class="painel painel-arvore">
         <div class="linha-titulo">
           <h2>Árvore Rubro-Negra</h2>
@@ -81,49 +121,27 @@
         </div>
         <div id="visualizacaoArvore" aria-live="polite"></div>
       </section>
-    </div>
 
-    <section class="painel">
-      <h2>Médicos cadastrados</h2>
-      <form id="formMedico" class="form-linha form-medico">
-        <label>Nome do médico<input id="nomeMedico" placeholder="Ex.: Dra. Beatriz" required maxlength="80"></label>
-        <button type="submit">Cadastrar médico</button>
-      </form>
-      <div class="tabela-wrap">
-        <table>
-          <thead><tr><th>ID</th><th>Médico</th><th>Atendimentos concluídos</th><th>Disponibilidade</th><th>Ação</th></tr></thead>
-          <tbody id="tabelaMedicos"></tbody>
-        </table>
-      </div>
-    </section>
+      <div class="grade-historico">
+        <section class="painel">
+          <h2>Pacientes cadastrados (ordem cronológica)</h2>
+          <div class="tabela-wrap">
+            <table>
+              <thead><tr><th>ID</th><th>Paciente</th><th>Prioridade</th><th>Status</th><th>Data de cadastro</th></tr></thead>
+              <tbody id="tabelaPacientes"><tr><td colspan="5" class="vazio">Nenhum paciente cadastrado.</td></tr></tbody>
+            </table>
+          </div>
+        </section>
 
-    <section class="painel">
-      <h2>Atendimentos em andamento</h2>
-      <div class="tabela-wrap">
-        <table>
-          <thead><tr><th>Nº</th><th>Paciente</th><th>Médico</th><th>Início</th><th>Ação</th></tr></thead>
-          <tbody id="tabelaAndamento"><tr><td colspan="5" class="vazio">Nenhum atendimento em andamento.</td></tr></tbody>
-        </table>
-      </div>
-    </section>
-
-    <section class="painel">
-      <h2>Histórico de atendimentos</h2>
-      <div class="tabela-wrap">
-        <table>
-          <thead><tr><th>Nº</th><th>Paciente</th><th>Médico</th><th>Início</th><th>Conclusão</th></tr></thead>
-          <tbody id="tabelaHistorico"><tr><td colspan="5" class="vazio">Nenhum atendimento concluído.</td></tr></tbody>
-        </table>
-      </div>
-    </section>
-
-    <section class="painel">
-      <h2>Pacientes cadastrados (ordem cronológica)</h2>
-      <div class="tabela-wrap">
-        <table>
-          <thead><tr><th>ID</th><th>Paciente</th><th>Prioridade</th><th>Status</th><th>Data de cadastro</th></tr></thead>
-          <tbody id="tabelaPacientes"><tr><td colspan="5" class="vazio">Nenhum paciente cadastrado.</td></tr></tbody>
-        </table>
+        <section class="painel">
+          <h2>Histórico de atendimentos</h2>
+          <div class="tabela-wrap">
+            <table>
+              <thead><tr><th>Nº</th><th>Paciente</th><th>Médico</th><th>Início</th><th>Conclusão</th></tr></thead>
+              <tbody id="tabelaHistorico"><tr><td colspan="5" class="vazio">Nenhum atendimento concluído.</td></tr></tbody>
+            </table>
+          </div>
+        </section>
       </div>
     </section>
     <p id="mensagem" class="mensagem" role="status"></p>
