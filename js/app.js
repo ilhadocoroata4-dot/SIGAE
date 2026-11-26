@@ -83,16 +83,31 @@ function renderizarArvore(){
   host.innerHTML=`<div class="arvore-rolagem"><svg class="diagrama-arvore" width="${largura}" height="${altura}" viewBox="0 0 ${largura} ${altura}" role="img" aria-label="Árvore Rubro-Negra com ${total} ${rotuloPacientes}"><g aria-hidden="true">${ligacoes.join("")}</g><g>${elementosNos}</g></svg></div>`;
 }
 
+function ativarAba(nome){
+  document.querySelectorAll("[data-aba]").forEach(btn=>{
+    const ativa=btn.dataset.aba===nome;
+    btn.classList.toggle("ativa",ativa);
+    btn.setAttribute("aria-selected",ativa?"true":"false");
+  });
+  document.querySelectorAll("[data-painel-aba]").forEach(painel=>{
+    painel.hidden=painel.dataset.painelAba!==nome;
+  });
+}
+
 function renderizar(){
   const fila=servicoPacientes.listar_fila_prioridade();
   const pacientes=servicoPacientes.listar_pacientes();
   const medicos=servicoAtendimentos.listar_medicos();
+  const disponiveis=servicoAtendimentos.listar_medicos_disponiveis();
   const andamento=servicoAtendimentos.listar_em_andamento();
   const historico=servicoAtendimentos.listar_historico();
   const medicosEmAtendimento=new Set(andamento.map(a=>String(a.medico.id)));
   $("totalAguardando").textContent=fila.length;
   $("totalAndamento").textContent=andamento.length;
-  $("totalMedicos").textContent=servicoAtendimentos.listar_medicos_disponiveis().length;
+  $("totalMedicos").textContent=disponiveis.length;
+  $("badgeAbaAtendimento").textContent=fila.length+andamento.length;
+  $("badgeAbaMedicos").textContent=`${disponiveis.length}/${medicos.length}`;
+  $("badgeAbaHistorico").textContent=pacientes.length;
   $("tabelaFila").innerHTML=fila.length?fila.map((p,i)=>`<tr><td>${i+1}</td><td>${escapar(p.id)}</td><td>${escapar(p.nome)}</td><td>${p.idade}</td><td>${selectPrioridade(p)}</td><td>${dataHora(p.data_cadastro)}</td><td><button class="acao" data-cancelar="${escapar(p.id)}">Cancelar</button></td></tr>`).join(""):linhaVazia(7,"Nenhum paciente aguardando.");
   $("tabelaMedicos").innerHTML=medicos.map(m=>{
     const emAtendimento=medicosEmAtendimento.has(String(m.id));
@@ -160,6 +175,8 @@ document.addEventListener("change",e=>{
   }catch(err){renderizar();mensagem(err.message,true);}
 });
 document.addEventListener("click",e=>{
+  const aba=e.target.closest("[data-aba]");
+  if(aba){ativarAba(aba.dataset.aba);return;}
   const cancelar=e.target.closest("[data-cancelar]");
   const concluir=e.target.closest("[data-concluir]");
   const toggleMedico=e.target.closest("[data-toggle-medico]");
@@ -168,6 +185,15 @@ document.addEventListener("click",e=>{
     if(concluir){const a=servicoAtendimentos.concluir_atendimento(concluir.dataset.concluir);salvarEstado(servicoPacientes,servicoAtendimentos);renderizar();mensagem(`Atendimento de ${a.paciente.nome} concluído.`);}
     if(toggleMedico){const m=servicoAtendimentos.alternar_disponibilidade_medico(toggleMedico.dataset.toggleMedico);salvarEstado(servicoPacientes,servicoAtendimentos);renderizar();mensagem(`Dr(a). ${m.nome} agora está ${m.disponivel?"disponível":"ausente"}.`);}
   }catch(err){mensagem(err.message,true);}
+});
+document.addEventListener("keydown",e=>{
+  const aba=e.target.closest("[data-aba]");
+  if(!aba||(e.key!=="ArrowRight"&&e.key!=="ArrowLeft"))return;
+  const abas=[...document.querySelectorAll("[data-aba]")];
+  const atual=abas.indexOf(aba);
+  const proximo=abas[(atual+(e.key==="ArrowRight"?1:-1)+abas.length)%abas.length];
+  ativarAba(proximo.dataset.aba);
+  proximo.focus();
 });
 carregarEstado(servicoPacientes,servicoAtendimentos);
 renderizar();
