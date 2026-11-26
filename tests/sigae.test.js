@@ -8,6 +8,13 @@ import { HeapMedicos } from "../js/estruturas/heap_medicos.js";
 import { servicoPacientes } from "../js/services/pacientes.js";
 import { servicoAtendimentos } from "../js/services/atendimentos.js";
 import { salvarEstado, carregarEstado, limparEstado } from "../js/storage.js";
+import { carregarCenarioExemplo } from "../js/demo.js";
+import {
+  gerarSvgArvoreRubroNegra,
+  gerarSvgHeapPacientes,
+  gerarSvgHeapMedicos,
+  gerarMapaTabelaHash
+} from "../js/visualizacoes.js";
 
 test("ArvoreRubroNegra mantém propriedades, ordem cronológica e desempate numérico de ID", () => {
   const arvore = new ArvoreRubroNegra();
@@ -131,4 +138,30 @@ test("Fluxo completo de atendimento, reclassificação, médicos e persistência
 
   limparEstado(mockStorage);
   assert.equal(store.size, 0);
+});
+
+test("Cenário de exemplo e geradores de visualização das 4 estruturas", () => {
+  const resumo = carregarCenarioExemplo(servicoPacientes, servicoAtendimentos);
+  assert.equal(resumo.totalPacientes, 7);
+  assert.equal(resumo.aguardando, 5);
+  assert.equal(resumo.emAndamento, 1);
+  assert.equal(resumo.concluidos, 1);
+  assert.equal(servicoPacientes.validar_estruturas(), true);
+  assert.equal(servicoAtendimentos.heapMedicos.validar(), true);
+
+  const svgArn = gerarSvgArvoreRubroNegra(servicoPacientes.arvore);
+  const svgHp = gerarSvgHeapPacientes(servicoPacientes.heap);
+  const svgHm = gerarSvgHeapMedicos(servicoAtendimentos.heapMedicos);
+  const htmlHash = gerarMapaTabelaHash(servicoPacientes.tabela, "3");
+
+  assert.match(svgArn, /<svg/);
+  assert.match(svgHp, /<svg/);
+  assert.match(svgHm, /<svg/);
+  assert.match(htmlHash, /bucket-destaque/);
+  assert.match(htmlHash, /Bucket #0/);
+
+  servicoAtendimentos.resetar();
+  servicoPacientes.resetar();
+  assert.match(gerarSvgArvoreRubroNegra(servicoPacientes.arvore), /Nenhum paciente/);
+  assert.match(gerarSvgHeapPacientes(servicoPacientes.heap), /Nenhum paciente/);
 });

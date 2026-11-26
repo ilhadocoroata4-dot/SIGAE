@@ -1,6 +1,13 @@
 import {servicoPacientes} from "./services/pacientes.js";
 import {servicoAtendimentos} from "./services/atendimentos.js";
 import {salvarEstado,carregarEstado,limparEstado} from "./storage.js";
+import {carregarCenarioExemplo} from "./demo.js";
+import {
+  gerarSvgArvoreRubroNegra,
+  gerarSvgHeapPacientes,
+  gerarSvgHeapMedicos,
+  gerarMapaTabelaHash
+} from "./visualizacoes.js";
 
 const $=id=>document.getElementById(id);
 const dataHora=valor=>new Date(valor).toLocaleString("pt-BR");
@@ -70,53 +77,37 @@ function renderizarBusca(){
   host.innerHTML=`<div class="card-busca"><strong>${escapar(paciente.nome)}</strong> (ID ${escapar(paciente.id)}) • Idade: ${paciente.idade} • ${tagPrioridade(paciente.prioridade)} • ${tagStatus(paciente.status)} • Cadastro: ${dataHora(paciente.data_cadastro)}<br><small>Tabela Hash: ${escapar(textoBucket)}</small></div>`;
 }
 
-function renderizarArvore(){
+function renderizarEstruturas(){
   const arvore=servicoPacientes.arvore;
-  const host=$("visualizacaoArvore");
-  const total=arvore.tamanho();
-  $("totalArvore").textContent=`${total} ${total===1?"paciente":"pacientes"} na árvore`;
-  if(arvore.esta_vazia()){
-    host.innerHTML='<p class="arvore-vazia">Nenhum paciente na árvore.</p>';
-    return;
-  }
+  const heapPac=servicoPacientes.heap;
+  const tabela=servicoPacientes.tabela;
+  const heapMed=servicoAtendimentos.heapMedicos;
 
-  const posicoes=new Map();
-  const nos=[];
-  let indice=0,profundidadeMaxima=0;
-  const posicionar=(no,profundidade)=>{
-    if(no===arvore.NIL)return;
-    profundidadeMaxima=Math.max(profundidadeMaxima,profundidade);
-    posicionar(no.esquerda,profundidade+1);
-    const ponto={x:52+indice*96,y:42+profundidade*88};
-    indice++;
-    posicoes.set(no,ponto);
-    nos.push(no);
-    posicionar(no.direita,profundidade+1);
-  };
-  posicionar(arvore.raiz,0);
+  const checks=[
+    ["Árvore Rubro-Negra",arvore.validar()],
+    ["Heap de Pacientes",heapPac.validar()],
+    ["Tabela Hash",tabela.validar()],
+    ["Heap de Médicos",heapMed.validar()]
+  ];
+  const validas=checks.filter(([,ok])=>ok).length;
+  $("badgeAbaEstruturas").textContent=`${validas}/4`;
+  $("barraIntegridade").innerHTML=checks.map(([nome,ok])=>`<span class="item-integridade${ok?"":" falha"}">${escapar(nome)}: ${ok?"Válida ✓":"Inválida ✗"}</span>`).join("");
 
-  const ligacoes=[];
-  for(const no of nos){
-    const origem=posicoes.get(no);
-    for(const filho of [no.esquerda,no.direita]){
-      if(filho!==arvore.NIL){
-        const destino=posicoes.get(filho);
-        ligacoes.push(`<line class="ligacao-arvore" x1="${origem.x}" y1="${origem.y}" x2="${destino.x}" y2="${destino.y}" />`);
-      }
-    }
-  }
-  const elementosNos=nos.map(no=>{
-    const {x,y}=posicoes.get(no);
-    const id=escapar(no.paciente.id);
-    const nome=escapar(no.paciente.nome);
-    const status=escapar(no.paciente.status);
-    const nomeCor=no.cor==="VERMELHO"?"vermelho":"preto";
-    return `<g class="no-arvore no-arvore--${nomeCor}" role="img" aria-label="Paciente ${id} (${nome}), nó ${nomeCor}, ${status}"><title>Paciente ${id} (${nome}) — nó ${nomeCor} (${status})</title><circle cx="${x}" cy="${y}" r="25"></circle><text x="${x}" y="${y}">${id}</text></g>`;
-  }).join("");
-  const largura=Math.max(104,(nos.length-1)*96+104);
-  const altura=profundidadeMaxima*88+84;
-  const rotuloPacientes=total===1?"paciente":"pacientes";
-  host.innerHTML=`<div class="arvore-rolagem"><svg class="diagrama-arvore" width="${largura}" height="${altura}" viewBox="0 0 ${largura} ${altura}" role="img" aria-label="Árvore Rubro-Negra com ${total} ${rotuloPacientes}"><g aria-hidden="true">${ligacoes.join("")}</g><g>${elementosNos}</g></svg></div>`;
+  const totalArv=arvore.tamanho();
+  $("totalArvore").textContent=`${totalArv} ${totalArv===1?"paciente":"pacientes"} na árvore`;
+  $("visualizacaoArvore").innerHTML=gerarSvgArvoreRubroNegra(arvore);
+
+  const totalHp=heapPac.tamanho();
+  $("totalHeapPacientes").textContent=`${totalHp} aguardando`;
+  $("visualizacaoHeapPacientes").innerHTML=gerarSvgHeapPacientes(heapPac);
+
+  const totalHm=heapMed.tamanho();
+  $("totalHeapMedicos").textContent=`${totalHm} ${totalHm===1?"disponível":"disponíveis"}`;
+  $("visualizacaoHeapMedicos").innerHTML=gerarSvgHeapMedicos(heapMed);
+
+  const cargaPct=Math.round(tabela.fator_carga_atual()*100);
+  $("resumoHash").textContent=`${tabela.tamanho()}/${tabela.capacidade} itens • Carga ${cargaPct}%`;
+  $("visualizacaoHash").innerHTML=gerarMapaTabelaHash(tabela,idBuscaAtual);
 }
 
 function ativarAba(nome){
@@ -181,11 +172,11 @@ function renderizar(){
       : `<button class="acao ${m.disponivel?"secundario":""}" data-toggle-medico="${escapar(m.id)}">${m.disponivel?"Marcar ausente":"Marcar disponível"}</button>`;
     return `<tr><td>${escapar(m.id)}</td><td>${escapar(m.nome)}</td><td>${m.atendimentos}</td><td><span class="tag ${classeTag}">${rotuloTag}</span></td><td>${botao}</td></tr>`;
   }).join("");
-  $("tabelaAndamento").innerHTML=andamento.length?andamento.map(a=>`<tr><td>${a.id}</td><td>${escapar(a.paciente.nome)}</td><td>${escapar(a.medico.nome)}</td><td>${dataHora(a.data_inicio)}</td><td><button class="acao" data-concluir="${a.id}">Concluir</button></td></tr>`).join(""):linhaVazia(5,"Nenhum atendimento em andamento.");
-  $("tabelaHistorico").innerHTML=historico.length?historico.map(a=>`<tr><td>${a.id}</td><td>${escapar(a.paciente.nome)}</td><td>${escapar(a.medico.nome)}</td><td>${dataHora(a.data_inicio)}</td><td>${dataHora(a.data_fim)}</td></tr>`).join(""):linhaVazia(5,"Nenhum atendimento concluído.");
+  $("tabelaAndamento").innerHTML=andamento.length?andamento.map(a=>`<tr><td>${a.id}</td><td>${escapar(a.paciente.nome)} <span class="tag prioridade-${Number(a.paciente.prioridade)}">P${Number(a.paciente.prioridade)}</span></td><td>${escapar(a.medico.nome)}</td><td>${dataHora(a.data_inicio)}</td><td><button class="acao" data-concluir="${a.id}">Concluir</button></td></tr>`).join(""):linhaVazia(5,"Nenhum atendimento em andamento.");
+  $("tabelaHistorico").innerHTML=historico.length?historico.map(a=>`<tr><td>${a.id}</td><td>${escapar(a.paciente.nome)} <span class="tag prioridade-${Number(a.paciente.prioridade)}">P${Number(a.paciente.prioridade)}</span></td><td>${escapar(a.medico.nome)}</td><td>${dataHora(a.data_inicio)}</td><td>${dataHora(a.data_fim)}</td></tr>`).join(""):linhaVazia(5,"Nenhum atendimento concluído.");
   $("tabelaPacientes").innerHTML=pacientes.length?pacientes.map(p=>`<tr><td>${escapar(p.id)}</td><td>${escapar(p.nome)}</td><td>${tagPrioridade(p.prioridade)}</td><td>${tagStatus(p.status)}</td><td>${dataHora(p.data_cadastro)}</td></tr>`).join(""):linhaVazia(5,"Nenhum paciente cadastrado.");
   renderizarBusca();
-  renderizarArvore();
+  renderizarEstruturas();
 }
 
 $("formPaciente").addEventListener("submit",e=>{
@@ -200,11 +191,13 @@ $("formBuscaPaciente").addEventListener("submit",e=>{
   e.preventDefault();
   idBuscaAtual=$("buscaIdPaciente").value.trim();
   renderizarBusca();
+  renderizarEstruturas();
 });
 $("btnLimparBusca").addEventListener("click",()=>{
   idBuscaAtual="";
   $("buscaIdPaciente").value="";
   renderizarBusca();
+  renderizarEstruturas();
 });
 $("btnFecharToast").addEventListener("click",fecharMensagem);
 $("formMedico").addEventListener("submit",e=>{
@@ -218,6 +211,16 @@ $("formMedico").addEventListener("submit",e=>{
 $("btnChamar").addEventListener("click",()=>{
   try{const a=servicoAtendimentos.chamar_proximo();salvarEstado(servicoPacientes,servicoAtendimentos);renderizar();mensagem(`${a.paciente.nome} chamado(a) pelo(a) Dr(a). ${a.medico.nome}.`);}
   catch(err){mensagem(err.message,true);}
+});
+$("btnExemplo").addEventListener("click",()=>{
+  const haDados=servicoPacientes.listar_pacientes().length>0||servicoAtendimentos.listar_historico().length>0;
+  if(haDados&&!window.confirm("Substituir os dados atuais por um cenário de demonstração?"))return;
+  const resumo=carregarCenarioExemplo(servicoPacientes,servicoAtendimentos);
+  salvarEstado(servicoPacientes,servicoAtendimentos);
+  idBuscaAtual="";
+  $("buscaIdPaciente").value="";
+  renderizar();
+  mensagem(`Cenário carregado: ${resumo.totalPacientes} pacientes, ${resumo.emAndamento} em atendimento e ${resumo.concluidos} concluído.`);
 });
 $("btnResetar").addEventListener("click",()=>{
   if(!window.confirm("Deseja limpar todos os cadastros e atendimentos e restaurar os médicos iniciais?"))return;
@@ -241,6 +244,15 @@ document.addEventListener("change",e=>{
 document.addEventListener("click",e=>{
   const aba=e.target.closest("[data-aba]");
   if(aba){ativarAba(aba.dataset.aba);return;}
+  const consultarId=e.target.closest("[data-consultar-id]");
+  if(consultarId){
+    idBuscaAtual=consultarId.dataset.consultarId;
+    $("buscaIdPaciente").value=idBuscaAtual;
+    renderizarBusca();
+    renderizarEstruturas();
+    $("formBuscaPaciente").scrollIntoView({behavior:"smooth",block:"nearest"});
+    return;
+  }
   const cancelar=e.target.closest("[data-cancelar]");
   const concluir=e.target.closest("[data-concluir]");
   const toggleMedico=e.target.closest("[data-toggle-medico]");

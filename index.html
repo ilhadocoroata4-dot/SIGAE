@@ -14,7 +14,8 @@
     </div>
     <div class="topo-acoes">
       <span class="status">Sistema local • JavaScript</span>
-      <button type="button" id="btnResetar" class="btn-reset">Limpar / Resetar demonstração</button>
+      <button type="button" id="btnExemplo" class="btn-topo">Carregar exemplo</button>
+      <button type="button" id="btnResetar" class="btn-reset">Limpar / Resetar</button>
     </div>
   </header>
 
@@ -63,7 +64,10 @@
         Médicos <span class="aba-badge" id="badgeAbaMedicos">0</span>
       </button>
       <button type="button" role="tab" id="tab-historico" class="aba" data-aba="historico" aria-selected="false" aria-controls="painel-historico">
-        Histórico &amp; Árvore <span class="aba-badge" id="badgeAbaHistorico">0</span>
+        Histórico <span class="aba-badge" id="badgeAbaHistorico">0</span>
+      </button>
+      <button type="button" role="tab" id="tab-estruturas" class="aba" data-aba="estruturas" aria-selected="false" aria-controls="painel-estruturas">
+        Estruturas de Dados <span class="aba-badge" id="badgeAbaEstruturas">4/4</span>
       </button>
     </nav>
 
@@ -110,19 +114,6 @@
     </section>
 
     <section id="painel-historico" class="painel-aba" role="tabpanel" aria-labelledby="tab-historico" data-painel-aba="historico" hidden>
-      <section class="painel painel-arvore">
-        <div class="linha-titulo">
-          <h2>Árvore Rubro-Negra</h2>
-          <span class="tag" id="totalArvore">0 pacientes na árvore</span>
-        </div>
-        <p class="ajuda">Cada nó mostra o ID do paciente. A árvore é ordenada pela data de cadastro e se reorganiza ao cadastrar ou cancelar pacientes.</p>
-        <div class="legenda-arvore" aria-label="Legenda das cores da árvore">
-          <span><i class="ponto-legenda ponto-vermelho"></i>Nó vermelho</span>
-          <span><i class="ponto-legenda ponto-preto"></i>Nó preto</span>
-        </div>
-        <div id="visualizacaoArvore" aria-live="polite"></div>
-      </section>
-
       <div class="grade-historico">
         <section class="painel">
           <h2>Pacientes cadastrados (ordem cronológica)</h2>
@@ -144,6 +135,52 @@
           </div>
         </section>
       </div>
+    </section>
+
+    <section id="painel-estruturas" class="painel-aba" role="tabpanel" aria-labelledby="tab-estruturas" data-painel-aba="estruturas" hidden>
+      <div id="barraIntegridade" class="barra-integridade" aria-live="polite"></div>
+
+      <section class="painel painel-arvore">
+        <div class="linha-titulo">
+          <h2>Árvore Rubro-Negra (ordem cronológica)</h2>
+          <span class="tag" id="totalArvore">0 pacientes na árvore</span>
+        </div>
+        <p class="ajuda">Cada nó mostra o ID do paciente. Mantém balanceamento automático em O(log n) por data de cadastro e ID.</p>
+        <div class="legenda-arvore" aria-label="Legenda das cores da árvore">
+          <span><i class="ponto-legenda ponto-vermelho"></i>Nó vermelho</span>
+          <span><i class="ponto-legenda ponto-preto"></i>Nó preto</span>
+        </div>
+        <div id="visualizacaoArvore" aria-live="polite"></div>
+      </section>
+
+      <div class="grade-estruturas">
+        <section class="painel">
+          <div class="linha-titulo">
+            <h2>Heap de Pacientes (Min-Heap)</h2>
+            <span class="tag" id="totalHeapPacientes">0 aguardando</span>
+          </div>
+          <p class="ajuda">Raiz destacada é o próximo paciente a ser chamado (menor prioridade → cadastro mais antigo → menor ID).</p>
+          <div id="visualizacaoHeapPacientes" aria-live="polite"></div>
+        </section>
+
+        <section class="painel">
+          <div class="linha-titulo">
+            <h2>Heap de Médicos (Min-Heap)</h2>
+            <span class="tag" id="totalHeapMedicos">0 disponíveis</span>
+          </div>
+          <p class="ajuda">Raiz destacada é o próximo médico disponível (menos atendimentos → ordem de cadastro → menor ID).</p>
+          <div id="visualizacaoHeapMedicos" aria-live="polite"></div>
+        </section>
+      </div>
+
+      <section class="painel">
+        <div class="linha-titulo">
+          <h2>Tabela Hash (encadeamento separado)</h2>
+          <span class="tag" id="resumoHash">0/10 • Carga 0%</span>
+        </div>
+        <p class="ajuda">Clique em qualquer paciente dentro de um bucket para consultá-lo rapidamente pelo ID. Buckets destacados indicam colisões ou a última busca.</p>
+        <div id="visualizacaoHash" aria-live="polite"></div>
+      </section>
     </section>
     <div id="mensagem" class="toast" role="status" aria-live="polite" hidden>
       <span id="mensagemTexto"></span>
