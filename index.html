@@ -71,8 +71,9 @@
       <section class="painel">
         <div class="linha-titulo">
           <h2>Fila de prioridade</h2>
-          <button id="btnChamar" class="destaque">Chamar próximo paciente</button>
+          <button id="btnChamar" class="destaque" disabled>Chamar próximo paciente</button>
         </div>
+        <div id="previaChamada" class="previa-chamada" aria-live="polite"></div>
         <div class="tabela-wrap">
           <table>
             <thead><tr><th>Ordem</th><th>ID</th><th>Paciente</th><th>Idade</th><th>Prioridade</th><th>Cadastro</th><th>Ação</th></tr></thead>
