@@ -1,0 +1,17 @@
+# Dependências e ambientes virtuais
+node_modules/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# Sistema operacional e editores
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs e arquivos temporários
+*.log
+.env
+.env.*
