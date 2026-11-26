@@ -20,7 +20,7 @@ function renderizar(){
   $("tabelaMedicos").innerHTML=medicos.map(m=>`<tr><td>${escapar(m.id)}</td><td>${escapar(m.nome)}</td><td>${m.atendimentos}</td><td><span class="tag ${m.disponivel?"ok":"off"}">${m.disponivel?"Disponível":"Em atendimento"}</span></td></tr>`).join("");
   $("tabelaAndamento").innerHTML=andamento.length?andamento.map(a=>`<tr><td>${a.id}</td><td>${escapar(a.paciente.nome)}</td><td>${escapar(a.medico.nome)}</td><td>${dataHora(a.data_inicio)}</td><td><button class="acao" data-concluir="${a.id}">Concluir</button></td></tr>`).join(""):linhaVazia(5,"Nenhum atendimento em andamento.");
   $("tabelaHistorico").innerHTML=historico.length?historico.map(a=>`<tr><td>${a.id}</td><td>${escapar(a.paciente.nome)}</td><td>${escapar(a.medico.nome)}</td><td>${dataHora(a.data_inicio)}</td><td>${dataHora(a.data_fim)}</td></tr>`).join(""):linhaVazia(5,"Nenhum atendimento concluído.");
-  $("tabelaPacientes").innerHTML=pacientes.length?pacientes.map(p=>`<tr><td>${p.id}</td><td>${escapar(p.nome)}</td><td>${p.prioridade}</td><td>${escapar(p.status)}</td><td>${dataHora(p.data_cadastro)}</td></tr>`).join(""):linhaVazia(5,"Nenhum paciente aguardando.");
+  $("tabelaPacientes").innerHTML=pacientes.length?pacientes.map(p=>`<tr><td>${p.id}</td><td>${escapar(p.nome)}</td><td>${p.prioridade}</td><td>${escapar(p.status)}</td><td>${dataHora(p.data_cadastro)}</td></tr>`).join(""):linhaVazia(5,"Nenhum paciente cadastrado.");
 }
 
 $("formPaciente").addEventListener("submit",e=>{
