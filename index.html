@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIGAE - Gestão de Atendimento</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="topo">
+    <div>
+      <h1>SIGAE</h1>
+      <p>Sistema Integrado de Gestão de Atendimento e Emergência</p>
+    </div>
+    <span class="status">Sistema local • JavaScript</span>
+  </header>
+
+  <main class="container">
+    <section class="resumo">
+      <article><span>Pacientes aguardando</span><strong id="totalAguardando">0</strong></article>
+      <article><span>Atendimentos em andamento</span><strong id="totalAndamento">0</strong></article>
+      <article><span>Médicos disponíveis</span><strong id="totalMedicos">0</strong></article>
+    </section>
+
+    <section class="painel">
+      <h2>Cadastrar paciente</h2>
+      <form id="formPaciente" class="form-grid">
+        <label>Nome<input id="nomePaciente" required maxlength="80"></label>
+        <label>Idade<input id="idadePaciente" type="number" min="0" max="120" required></label>
+        <label>Prioridade
+          <select id="prioridadePaciente" required>
+            <option value="1">1 - Emergência</option>
+            <option value="2">2 - Muito urgente</option>
+            <option value="3" selected>3 - Urgente</option>
+            <option value="4">4 - Pouco urgente</option>
+            <option value="5">5 - Não urgente</option>
+          </select>
+        </label>
+        <button type="submit">Cadastrar paciente</button>
+      </form>
+    </section>
+
+    <section class="painel">
+      <div class="linha-titulo">
+        <h2>Fila de prioridade</h2>
+        <button id="btnChamar" class="destaque">Chamar próximo paciente</button>
+      </div>
+      <div class="tabela-wrap">
+        <table>
+          <thead><tr><th>Ordem</th><th>Paciente</th><th>Idade</th><th>Prioridade</th><th>Cadastro</th><th>Ação</th></tr></thead>
+          <tbody id="tabelaFila"><tr><td colspan="6" class="vazio">Nenhum paciente aguardando.</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="painel">
+      <h2>Médicos cadastrados</h2>
+      <p class="ajuda">Os médicos são pré-cadastrados no arquivo <code>js/services/atendimentos.js</code>.</p>
+      <div class="tabela-wrap">
+        <table>
+          <thead><tr><th>ID</th><th>Médico</th><th>Atendimentos concluídos</th><th>Disponibilidade</th></tr></thead>
+          <tbody id="tabelaMedicos"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="painel">
+      <h2>Atendimentos em andamento</h2>
+      <div class="tabela-wrap">
+        <table>
+          <thead><tr><th>Nº</th><th>Paciente</th><th>Médico</th><th>Início</th><th>Ação</th></tr></thead>
+          <tbody id="tabelaAndamento"><tr><td colspan="5" class="vazio">Nenhum atendimento em andamento.</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="painel">
+      <h2>Histórico de atendimentos</h2>
+      <div class="tabela-wrap">
+        <table>
+          <thead><tr><th>Nº</th><th>Paciente</th><th>Médico</th><th>Início</th><th>Conclusão</th></tr></thead>
+          <tbody id="tabelaHistorico"><tr><td colspan="5" class="vazio">Nenhum atendimento concluído.</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="painel">
+      <h2>Pacientes cadastrados (ordem cronológica)</h2>
+      <div class="tabela-wrap">
+        <table>
+          <thead><tr><th>ID</th><th>Paciente</th><th>Prioridade</th><th>Status</th><th>Data de cadastro</th></tr></thead>
+          <tbody id="tabelaPacientes"><tr><td colspan="5" class="vazio">Nenhum paciente cadastrado.</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+    <p id="mensagem" class="mensagem" role="status"></p>
+  </main>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
