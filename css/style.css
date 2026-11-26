@@ -1,0 +1,28 @@
+*{box-sizing:border-box}
+body{margin:0;background:#f3f6fb;color:#1d2939;font-family:Arial,Helvetica,sans-serif}
+.topo{background:#173b67;color:white;padding:24px max(5%,calc((100% - 1200px)/2));display:flex;justify-content:space-between;align-items:center;gap:20px}
+.topo h1{margin:0 0 6px;font-size:30px}.topo p{margin:0;color:#d7e5f6}
+.status{font-size:13px;background:#ffffff20;padding:9px 12px;border-radius:20px}
+.container{max-width:1200px;margin:26px auto;padding:0 18px}
+.resumo{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px}
+.resumo article,.painel{background:white;border:1px solid #e1e7ef;border-radius:12px;padding:20px;box-shadow:0 2px 8px #152b4609}
+.resumo span{display:block;color:#667085;font-size:14px}.resumo strong{display:block;font-size:30px;margin-top:8px;color:#174a7e}
+.painel{margin-bottom:18px}.painel h2{font-size:19px;margin:0 0 16px}
+.form-grid{display:grid;grid-template-columns:2fr 1fr 1.5fr auto;gap:12px;align-items:end}
+label{display:flex;flex-direction:column;gap:7px;font-size:13px;font-weight:600;color:#475467}
+input,select{width:100%;border:1px solid #cfd8e3;border-radius:7px;padding:11px;background:#fff;font-size:14px;color:#1d2939}
+button{border:0;border-radius:7px;padding:11px 15px;background:#e7edf5;color:#173b67;font-weight:700;cursor:pointer}
+button:hover{filter:brightness(.96)}button:disabled{opacity:.45;cursor:not-allowed}
+button.destaque,.form-grid button{background:#1769aa;color:white}
+.linha-titulo{display:flex;justify-content:space-between;align-items:center;gap:12px}.linha-titulo h2{margin:0 0 14px}
+.tabela-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:620px}
+th,td{text-align:left;padding:12px 10px;border-bottom:1px solid #edf0f4;font-size:13px}
+th{color:#667085;font-weight:700;background:#f8fafc}
+td{color:#344054}.vazio{text-align:center;color:#98a2b3;padding:22px}
+.ajuda{font-size:13px;color:#667085;margin-top:-7px}
+.mensagem{position:sticky;bottom:12px;min-height:20px;font-weight:600;color:#1769aa}
+.tag{display:inline-block;padding:4px 8px;border-radius:20px;background:#eef4fb;color:#245b8e;font-size:12px}
+.tag.ok{background:#e7f7ed;color:#187443}.tag.off{background:#f2f4f7;color:#667085}
+.acao{padding:7px 10px;font-size:12px;background:#1769aa;color:#fff}
+@media(max-width:760px){.topo{align-items:flex-start;flex-direction:column}.resumo{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.linha-titulo{align-items:flex-start;flex-direction:column}}
