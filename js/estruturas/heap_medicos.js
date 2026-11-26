@@ -13,8 +13,12 @@ export class HeapMedicos {
     const id=String(m.id);if(this.medicos.has(id))throw new Error("Médico já cadastrado.");
     const atendimentos=m.atendimentos??0;
     if(typeof atendimentos==="boolean"||!Number.isInteger(atendimentos)||atendimentos<0)throw new Error("Quantidade de atendimentos inválida.");
-    m.atendimentos=atendimentos;m.ordem_cadastro=this.proximaOrdem++;m.disponivel=true;
-    this.medicos.set(id,m);this.adicionarHeap(m);return m;
+    const ordem=m.ordem_cadastro!=null?Number(m.ordem_cadastro):this.proximaOrdem++;
+    if(!Number.isInteger(ordem)||ordem<0)throw new Error("Ordem de cadastro inválida.");
+    this.proximaOrdem=Math.max(this.proximaOrdem,ordem+1);
+    const disponivel=m.disponivel!==undefined?Boolean(m.disponivel):true;
+    m.atendimentos=atendimentos;m.ordem_cadastro=ordem;m.disponivel=disponivel;
+    this.medicos.set(id,m);if(disponivel)this.adicionarHeap(m);return m;
   }
   adicionarHeap(m){const id=String(m.id);if(this.posicoes.has(id))return;this.heap.push(m);let i=this.heap.length-1;this.posicoes.set(id,i);this.subir(i);}
   buscar(id){return this.medicos.get(String(id))??null;}

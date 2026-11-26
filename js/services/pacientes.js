@@ -41,5 +41,26 @@ export class ServicoPacientes {
     p.status="Concluído";
   }
   validar_estruturas(){return this.arvore.validar()&&this.heap.validar()&&this.tabela.validar();}
+  exportar_estado(){
+    return {
+      proximoId:this.proximoId,
+      pacientes:this.arvore.listar_cronologico().map(p=>({...p}))
+    };
+  }
+  restaurar_estado(estado){
+    this.resetar();
+    const lista=Array.isArray(estado?.pacientes)?estado.pacientes:[];
+    let maxId=0;
+    for(const item of lista){
+      const p={...item};
+      this.arvore.inserir(p);
+      this.tabela.inserir(p);
+      if(p.status==="Aguardando")this.heap.inserir(p);
+      if(/^\d+$/.test(String(p.id)))maxId=Math.max(maxId,Number(p.id));
+    }
+    const proximo=Number(estado?.proximoId);
+    this.proximoId=Math.max(Number.isInteger(proximo)&&proximo>0?proximo:1,maxId+1);
+  }
+  resetar(){this.arvore.limpar();this.heap.limpar();this.tabela.limpar();this.proximoId=1;}
 }
 export const servicoPacientes=new ServicoPacientes();
