@@ -41,24 +41,37 @@
     </section>
 
     <section class="painel">
+      <h2>Consultar paciente por ID (Tabela Hash)</h2>
+      <form id="formBuscaPaciente" class="form-linha">
+        <label>ID do paciente<input id="buscaIdPaciente" placeholder="Ex.: 1" required></label>
+        <button type="submit">Buscar</button>
+        <button type="button" id="btnLimparBusca" class="secundario">Limpar</button>
+      </form>
+      <div id="resultadoBusca" class="resultado-busca" aria-live="polite"></div>
+    </section>
+
+    <section class="painel">
       <div class="linha-titulo">
         <h2>Fila de prioridade</h2>
         <button id="btnChamar" class="destaque">Chamar próximo paciente</button>
       </div>
       <div class="tabela-wrap">
         <table>
-          <thead><tr><th>Ordem</th><th>Paciente</th><th>Idade</th><th>Prioridade</th><th>Cadastro</th><th>Ação</th></tr></thead>
-          <tbody id="tabelaFila"><tr><td colspan="6" class="vazio">Nenhum paciente aguardando.</td></tr></tbody>
+          <thead><tr><th>Ordem</th><th>ID</th><th>Paciente</th><th>Idade</th><th>Prioridade</th><th>Cadastro</th><th>Ação</th></tr></thead>
+          <tbody id="tabelaFila"><tr><td colspan="7" class="vazio">Nenhum paciente aguardando.</td></tr></tbody>
         </table>
       </div>
     </section>
 
     <section class="painel">
       <h2>Médicos cadastrados</h2>
-      <p class="ajuda">Os médicos são pré-cadastrados no arquivo <code>js/services/atendimentos.js</code>.</p>
+      <form id="formMedico" class="form-linha form-medico">
+        <label>Nome do médico<input id="nomeMedico" placeholder="Ex.: Dra. Beatriz" required maxlength="80"></label>
+        <button type="submit">Cadastrar médico</button>
+      </form>
       <div class="tabela-wrap">
         <table>
-          <thead><tr><th>ID</th><th>Médico</th><th>Atendimentos concluídos</th><th>Disponibilidade</th></tr></thead>
+          <thead><tr><th>ID</th><th>Médico</th><th>Atendimentos concluídos</th><th>Disponibilidade</th><th>Ação</th></tr></thead>
           <tbody id="tabelaMedicos"></tbody>
         </table>
       </div>
