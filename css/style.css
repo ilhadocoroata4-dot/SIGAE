@@ -56,8 +56,17 @@ td{color:#344054}.vazio{text-align:center;color:#98a2b3;padding:22px}
 .no-arvore text{fill:#fff;text-anchor:middle;dominant-baseline:central;font-size:13px;font-weight:700;font-family:Arial,Helvetica,sans-serif}
 .arvore-vazia{text-align:center;color:#98a2b3;padding:28px 12px;margin:0;border:1px dashed #d0d9e4;border-radius:10px;background:#f8fafc;font-size:14px}
 .mensagem{position:sticky;bottom:12px;min-height:20px;font-weight:600;color:#1769aa}
-.tag{display:inline-block;padding:4px 8px;border-radius:20px;background:#eef4fb;color:#245b8e;font-size:12px}
-.tag.ok{background:#e7f7ed;color:#187443}.tag.off{background:#f2f4f7;color:#667085}
+.tag{display:inline-block;padding:4px 9px;border-radius:20px;background:#eef4fb;color:#245b8e;font-size:12px;font-weight:600;border:1px solid transparent;white-space:nowrap}
+.tag.ok,.tag.status-concluido{background:#e7f7ed;color:#187443;border-color:#b7e4c7}
+.tag.off,.tag.status-cancelado{background:#f2f4f7;color:#667085;border-color:#e4e7ec}
+.tag.status-aguardando{background:#eef4fb;color:#245b8e;border-color:#d5e4f5}
+.tag.status-atendimento{background:#ede9fe;color:#5b21b6;border-color:#ddd6fe}
+.prioridade-1{background:#fde8e8;color:#b42318;border-color:#f5c2c0;font-weight:700}
+.prioridade-2{background:#fff0e5;color:#b54708;border-color:#f7d0b6;font-weight:700}
+.prioridade-3{background:#fef7db;color:#854d0e;border-color:#f3dc91;font-weight:700}
+.prioridade-4{background:#e7f7ed;color:#187443;border-color:#b7e4c7;font-weight:700}
+.prioridade-5{background:#e7f1fb;color:#175cd3;border-color:#bfd9f8;font-weight:700}
+.select-prioridade.prioridade-1,.select-prioridade.prioridade-2,.select-prioridade.prioridade-3,.select-prioridade.prioridade-4,.select-prioridade.prioridade-5{border-width:1px}
 .acao{padding:7px 10px;font-size:12px;background:#1769aa;color:#fff}
 @media(max-width:1000px){.grade-topo-operacao,.grade-historico{grid-template-columns:1fr}}
 @media(max-width:760px){.topo{align-items:flex-start;flex-direction:column}.resumo{grid-template-columns:1fr}.form-grid,.form-grid-compacto{grid-template-columns:1fr}.form-grid-compacto .campo-largo{grid-column:1}.linha-titulo{align-items:flex-start;flex-direction:column}}
