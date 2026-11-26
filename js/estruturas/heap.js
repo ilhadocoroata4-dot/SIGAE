@@ -1,10 +1,10 @@
-// Min-heap de pacientes: prioridade menor primeiro, depois data e ID.
+// Min-heap: prioridade menor primeiro, idade maior no desempate, depois data e ID.
 export class HeapPacientes {
   constructor(){ this.heap=[]; this.posicoes=new Map(); }
-  chave(p){ return [Number(p.prioridade), new Date(p.data_cadastro).getTime(), String(p.id)]; }
+  chave(p){ return [Number(p.prioridade), -Number(p.idade), new Date(p.data_cadastro).getTime(), String(p.id)]; }
   comparar(a,b){
     const x=this.chave(a), y=this.chave(b);
-    for(let i=0;i<3;i++){ if(x[i]<y[i]) return -1; if(x[i]>y[i]) return 1; }
+    for(let i=0;i<4;i++){ if(x[i]<y[i]) return -1; if(x[i]>y[i]) return 1; }
     return 0;
   }
   trocar(i,j){

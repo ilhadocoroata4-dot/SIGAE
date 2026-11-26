@@ -22,36 +22,54 @@
       <article><span>Médicos disponíveis</span><strong id="totalMedicos">0</strong></article>
     </section>
 
-    <section class="painel">
-      <h2>Cadastrar paciente</h2>
-      <form id="formPaciente" class="form-grid">
-        <label>Nome<input id="nomePaciente" required maxlength="80"></label>
-        <label>Idade<input id="idadePaciente" type="number" min="0" max="120" required></label>
-        <label>Prioridade
-          <select id="prioridadePaciente" required>
-            <option value="1">1 - Emergência</option>
-            <option value="2">2 - Muito urgente</option>
-            <option value="3" selected>3 - Urgente</option>
-            <option value="4">4 - Pouco urgente</option>
-            <option value="5">5 - Não urgente</option>
-          </select>
-        </label>
-        <button type="submit">Cadastrar paciente</button>
-      </form>
-    </section>
+    <div class="area-distribuicao">
+      <div class="coluna-operacao">
+        <section class="painel">
+          <h2>Cadastrar paciente</h2>
+          <form id="formPaciente" class="form-grid">
+            <label>Nome<input id="nomePaciente" required maxlength="80"></label>
+            <label>Idade<input id="idadePaciente" type="number" min="0" max="120" required></label>
+            <label>Prioridade
+              <select id="prioridadePaciente" required>
+                <option value="1">1 - Emergência</option>
+                <option value="2">2 - Muito urgente</option>
+                <option value="3" selected>3 - Urgente</option>
+                <option value="4">4 - Pouco urgente</option>
+                <option value="5">5 - Não urgente</option>
+              </select>
+            </label>
+            <button type="submit">Cadastrar paciente</button>
+          </form>
+        </section>
 
-    <section class="painel">
-      <div class="linha-titulo">
-        <h2>Fila de prioridade</h2>
-        <button id="btnChamar" class="destaque">Chamar próximo paciente</button>
+        <section class="painel">
+          <div class="linha-titulo">
+            <h2>Fila de prioridade</h2>
+            <button id="btnChamar" class="destaque">Chamar próximo paciente</button>
+          </div>
+          <p class="ajuda">Em caso de mesma prioridade, pacientes mais velhos são atendidos primeiro.</p>
+          <div class="tabela-wrap">
+            <table>
+              <thead><tr><th>Ordem</th><th>Paciente</th><th>Idade</th><th>Prioridade</th><th>Cadastro</th><th>Ação</th></tr></thead>
+              <tbody id="tabelaFila"><tr><td colspan="6" class="vazio">Nenhum paciente aguardando.</td></tr></tbody>
+            </table>
+          </div>
+        </section>
       </div>
-      <div class="tabela-wrap">
-        <table>
-          <thead><tr><th>Ordem</th><th>Paciente</th><th>Idade</th><th>Prioridade</th><th>Cadastro</th><th>Ação</th></tr></thead>
-          <tbody id="tabelaFila"><tr><td colspan="6" class="vazio">Nenhum paciente aguardando.</td></tr></tbody>
-        </table>
-      </div>
-    </section>
+
+      <section class="painel painel-arvore">
+        <div class="linha-titulo">
+          <h2>Árvore Rubro-Negra</h2>
+          <span class="tag" id="totalArvore">0 pacientes aguardando</span>
+        </div>
+        <p class="ajuda">Cada nó mostra o ID do paciente. A árvore é ordenada pela data de cadastro e se reorganiza ao cadastrar, chamar ou cancelar pacientes.</p>
+        <div class="legenda-arvore" aria-label="Legenda das cores da árvore">
+          <span><i class="ponto-legenda ponto-vermelho"></i>Nó vermelho</span>
+          <span><i class="ponto-legenda ponto-preto"></i>Nó preto</span>
+        </div>
+        <div id="visualizacaoArvore" aria-live="polite"></div>
+      </section>
+    </div>
 
     <section class="painel">
       <h2>Médicos cadastrados</h2>
