@@ -3,7 +3,10 @@ import {servicoPacientes} from "./pacientes.js";
 
 export class ServicoAtendimentos {
   constructor(){
-    this.heapMedicos=new HeapMedicos();this.emAndamento=new Map();this.historico=[];this.proximoAtendimento=1;
+    this.heapMedicos=new HeapMedicos();this.emAndamento=new Map();this.historico=[];this.proximoAtendimento=1;this.proximoMedicoId=105;
+    this._inserirMedicosPadrao();
+  }
+  _inserirMedicosPadrao(){
     // Médicos de demonstração: altere esta lista conforme necessário.
     [
       {id:"101",nome:"Carlos"},
@@ -11,6 +14,24 @@ export class ServicoAtendimentos {
       {id:"103",nome:"Roberto"},
       {id:"104",nome:"Ana"}
     ].forEach(m=>this.heapMedicos.inserir({...m,atendimentos:0}));
+  }
+  cadastrar_medico(nome,id=null){
+    nome=String(nome??"").trim();
+    if(!nome)throw new Error("Informe o nome do médico.");
+    let idMedico=id!=null&&String(id).trim()!==""?String(id).trim():null;
+    if(!idMedico){
+      while(this.heapMedicos.buscar(String(this.proximoMedicoId)))this.proximoMedicoId++;
+      idMedico=String(this.proximoMedicoId++);
+    }
+    return this.heapMedicos.inserir({id:idMedico,nome,atendimentos:0});
+  }
+  alternar_disponibilidade_medico(id){
+    const medico=this.heapMedicos.buscar(id);
+    if(!medico)throw new Error("Médico não encontrado.");
+    const emAtendimento=[...this.emAndamento.values()].some(a=>String(a.medico.id)===String(id));
+    if(emAtendimento)throw new Error("Médico está em atendimento no momento.");
+    this.heapMedicos.atualizar_disponibilidade(id,!medico.disponivel);
+    return medico;
   }
   listar_medicos(){return this.heapMedicos.listar_todos();}
   listar_medicos_disponiveis(){return this.heapMedicos.listar();}

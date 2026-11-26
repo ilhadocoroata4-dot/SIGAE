@@ -9,11 +9,19 @@ body{margin:0;background:#f3f6fb;color:#1d2939;font-family:Arial,Helvetica,sans-
 .resumo span{display:block;color:#667085;font-size:14px}.resumo strong{display:block;font-size:30px;margin-top:8px;color:#174a7e}
 .painel{margin-bottom:18px}.painel h2{font-size:19px;margin:0 0 16px}
 .form-grid{display:grid;grid-template-columns:2fr 1fr 1.5fr auto;gap:12px;align-items:end}
+.form-linha{display:flex;gap:12px;align-items:end;flex-wrap:wrap}
+.form-linha label{flex:1;min-width:200px}
+.form-medico{margin-bottom:16px}
 label{display:flex;flex-direction:column;gap:7px;font-size:13px;font-weight:600;color:#475467}
 input,select{width:100%;border:1px solid #cfd8e3;border-radius:7px;padding:11px;background:#fff;font-size:14px;color:#1d2939}
 button{border:0;border-radius:7px;padding:11px 15px;background:#e7edf5;color:#173b67;font-weight:700;cursor:pointer}
 button:hover{filter:brightness(.96)}button:disabled{opacity:.45;cursor:not-allowed}
-button.destaque,.form-grid button{background:#1769aa;color:white}
+button.destaque,.form-grid button,.form-linha button[type="submit"]{background:#1769aa;color:white}
+button.secundario,.acao.secundario{background:#e7edf5;color:#173b67}
+.select-prioridade{width:auto;min-width:165px;padding:6px 8px;font-size:12px}
+.resultado-busca{margin-top:14px}
+.card-busca{background:#f8fafc;border:1px solid #dce5f0;border-radius:8px;padding:12px 14px;font-size:13px;line-height:1.6}
+.card-busca.vazio-busca{color:#667085}
 .linha-titulo{display:flex;justify-content:space-between;align-items:center;gap:12px}.linha-titulo h2{margin:0 0 14px}
 .tabela-wrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse;min-width:620px}
