@@ -1,15 +1,24 @@
+import { compararIds } from "./comparadores.js";
+
 // Min-heap: menos atendimentos concluídos, ordem de cadastro e ID.
 export class HeapMedicos {
   constructor(){this.heap=[];this.posicoes=new Map();this.medicos=new Map();this.proximaOrdem=0;}
   chave(m){return [Number(m.atendimentos??0),Number(m.ordem_cadastro),String(m.id)];}
-  comparar(a,b){const x=this.chave(a),y=this.chave(b);for(let i=0;i<3;i++){if(x[i]<y[i])return -1;if(x[i]>y[i])return 1;}return 0;}
+  comparar(a,b){const x=this.chave(a),y=this.chave(b);return x[0]-y[0]||x[1]-y[1]||compararIds(x[2],y[2]);}
   trocar(i,j){[this.heap[i],this.heap[j]]=[this.heap[j],this.heap[i]];this.posicoes.set(String(this.heap[i].id),i);this.posicoes.set(String(this.heap[j].id),j);}
   subir(i){while(i>0){let p=Math.floor((i-1)/2);if(this.comparar(this.heap[i],this.heap[p])<0){this.trocar(i,p);i=p;}else break;}}
   descer(i){while(true){let m=i,e=2*i+1,d=2*i+2;if(e<this.heap.length&&this.comparar(this.heap[e],this.heap[m])<0)m=e;if(d<this.heap.length&&this.comparar(this.heap[d],this.heap[m])<0)m=d;if(m===i)break;this.trocar(i,m);i=m;}}
   inserir(m){
-    const id=String(m.id);if(m.id==null||this.medicos.has(id))throw new Error("Médico sem ID ou já cadastrado.");
-    m.atendimentos=Number(m.atendimentos??0);m.ordem_cadastro=this.proximaOrdem++;m.disponivel=true;
-    this.medicos.set(id,m);this.adicionarHeap(m);return m;
+    if(!m||m.id==null)throw new Error("Médico sem ID.");
+    const id=String(m.id);if(this.medicos.has(id))throw new Error("Médico já cadastrado.");
+    const atendimentos=m.atendimentos??0;
+    if(typeof atendimentos==="boolean"||!Number.isInteger(atendimentos)||atendimentos<0)throw new Error("Quantidade de atendimentos inválida.");
+    const ordem=m.ordem_cadastro!=null?Number(m.ordem_cadastro):this.proximaOrdem++;
+    if(!Number.isInteger(ordem)||ordem<0)throw new Error("Ordem de cadastro inválida.");
+    this.proximaOrdem=Math.max(this.proximaOrdem,ordem+1);
+    const disponivel=m.disponivel!==undefined?Boolean(m.disponivel):true;
+    m.atendimentos=atendimentos;m.ordem_cadastro=ordem;m.disponivel=disponivel;
+    this.medicos.set(id,m);if(disponivel)this.adicionarHeap(m);return m;
   }
   adicionarHeap(m){const id=String(m.id);if(this.posicoes.has(id))return;this.heap.push(m);let i=this.heap.length-1;this.posicoes.set(id,i);this.subir(i);}
   buscar(id){return this.medicos.get(String(id))??null;}

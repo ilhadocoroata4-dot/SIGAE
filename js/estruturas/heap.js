@@ -1,11 +1,12 @@
+import { compararIds, parseTimestamp, validarPrioridade } from "./comparadores.js";
+
 // Min-heap de pacientes: prioridade menor primeiro, depois data e ID.
 export class HeapPacientes {
   constructor(){ this.heap=[]; this.posicoes=new Map(); }
-  chave(p){ return [Number(p.prioridade), new Date(p.data_cadastro).getTime(), String(p.id)]; }
+  chave(p){ return [Number(p.prioridade), parseTimestamp(p.data_cadastro), String(p.id)]; }
   comparar(a,b){
     const x=this.chave(a), y=this.chave(b);
-    for(let i=0;i<3;i++){ if(x[i]<y[i]) return -1; if(x[i]>y[i]) return 1; }
-    return 0;
+    return x[0]-y[0] || x[1]-y[1] || compararIds(x[2],y[2]);
   }
   trocar(i,j){
     [this.heap[i],this.heap[j]]=[this.heap[j],this.heap[i]];
@@ -23,7 +24,8 @@ export class HeapPacientes {
   }
   inserir(p){
     if(!p||p.id==null)throw new Error("Paciente precisa ter ID.");
-    if(!Number.isInteger(Number(p.prioridade))||p.prioridade<1||p.prioridade>5)throw new Error("Prioridade deve ser de 1 a 5.");
+    p.prioridade=validarPrioridade(p.prioridade);
+    parseTimestamp(p.data_cadastro);
     const id=String(p.id); if(this.posicoes.has(id))throw new Error("Paciente já está no Heap.");
     this.heap.push(p); const i=this.heap.length-1; this.posicoes.set(id,i); this.subir(i); return p;
   }
@@ -37,8 +39,8 @@ export class HeapPacientes {
     return removido;
   }
   atualizar_prioridade(id,nova){
-    if(!Number.isInteger(Number(nova))||nova<1||nova>5)throw new Error("Prioridade deve ser de 1 a 5.");
-    const p=this.buscar(id);if(!p)return false;p.prioridade=Number(nova);
+    const novaPrioridade=validarPrioridade(nova);
+    const p=this.buscar(id);if(!p)return false;p.prioridade=novaPrioridade;
     const i=this.posicoes.get(String(id));this.subir(i);this.descer(this.posicoes.get(String(id)));return true;
   }
   listar(){return [...this.heap].sort((a,b)=>this.comparar(a,b));}

@@ -13,19 +13,54 @@ export class ServicoPacientes {
     this.arvore.inserir(paciente);this.heap.inserir(paciente);this.tabela.inserir(paciente);return paciente;
   }
   consultar_paciente(id){return this.tabela.buscar(id);}
+  obter_bucket_hash(id){
+    const idStr=String(id??"").trim();
+    if(!idStr)return null;
+    const bucket=this.tabela.funcaoHash(idStr);
+    const itensNoBucket=this.tabela.tabela[bucket].length;
+    return {bucket,capacidade:this.tabela.capacidade,itensNoBucket};
+  }
   listar_pacientes(){return this.arvore.listar_cronologico();}
   listar_fila_prioridade(){return this.heap.listar();}
   reclassificar_paciente(id,nova){
     const p=this.tabela.buscar(id);if(!p)throw new Error("Paciente não encontrado.");
     if(p.status!=="Aguardando")throw new Error("Só é possível reclassificar paciente aguardando.");
-    this.heap.atualizar_prioridade(id,Number(nova));return p;
+    this.heap.atualizar_prioridade(id,nova);return p;
   }
   cancelar_paciente(id){
     const p=this.tabela.buscar(id);if(!p)throw new Error("Paciente não encontrado.");
     if(p.status!=="Aguardando")throw new Error("Só é possível cancelar paciente aguardando.");
-    this.heap.remover(id);this.arvore.remover(id);this.tabela.remover(id);p.status="Cancelado";return p;
+    this.heap.remover(id);this.arvore.remover(p.id);this.tabela.remover(id);p.status="Cancelado";return p;
   }
-  marcar_em_atendimento(p){this.heap.remover(p.id);this.arvore.remover(p.id);p.status="Em atendimento";}
+  marcar_em_atendimento(p){
+    if(!p||p.status!=="Aguardando")throw new Error("Paciente não está aguardando.");
+    this.heap.remover(p.id);p.status="Em atendimento";
+  }
+  marcar_concluido(p){
+    if(!p||p.status!=="Em atendimento")throw new Error("Paciente não está em atendimento.");
+    p.status="Concluído";
+  }
   validar_estruturas(){return this.arvore.validar()&&this.heap.validar()&&this.tabela.validar();}
+  exportar_estado(){
+    return {
+      proximoId:this.proximoId,
+      pacientes:this.arvore.listar_cronologico().map(p=>({...p}))
+    };
+  }
+  restaurar_estado(estado){
+    this.resetar();
+    const lista=Array.isArray(estado?.pacientes)?estado.pacientes:[];
+    let maxId=0;
+    for(const item of lista){
+      const p={...item};
+      this.arvore.inserir(p);
+      this.tabela.inserir(p);
+      if(p.status==="Aguardando")this.heap.inserir(p);
+      if(/^\d+$/.test(String(p.id)))maxId=Math.max(maxId,Number(p.id));
+    }
+    const proximo=Number(estado?.proximoId);
+    this.proximoId=Math.max(Number.isInteger(proximo)&&proximo>0?proximo:1,maxId+1);
+  }
+  resetar(){this.arvore.limpar();this.heap.limpar();this.tabela.limpar();this.proximoId=1;}
 }
 export const servicoPacientes=new ServicoPacientes();

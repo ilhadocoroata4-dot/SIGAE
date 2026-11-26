@@ -1,3 +1,5 @@
+import { compararIds, parseTimestamp } from "./comparadores.js";
+
 // Árvore Rubro-Negra ordenada por data de cadastro e ID.
 const VERMELHO="VERMELHO", PRETO="PRETO";
 class No {
@@ -5,8 +7,8 @@ class No {
 }
 export class ArvoreRubroNegra {
   constructor(){this.NIL=new No(null,null);this.NIL.cor=PRETO;this.NIL.esquerda=this.NIL;this.NIL.direita=this.NIL;this.NIL.pai=this.NIL;this.raiz=this.NIL;this.quantidade=0;}
-  chave(p){if(p?.id==null||!p.data_cadastro)throw new Error("Paciente precisa de ID e data_cadastro.");return [new Date(p.data_cadastro).getTime(),String(p.id)];}
-  cmp(a,b){return a[0]-b[0]||(a[1]<b[1]?-1:a[1]>b[1]?1:0);}
+  chave(p){if(p?.id==null)throw new Error("Paciente precisa de ID e data_cadastro.");return [parseTimestamp(p.data_cadastro),String(p.id)];}
+  cmp(a,b){return a[0]-b[0]||compararIds(a[1],b[1]);}
   inserir(p){
     const k=this.chave(p);let pai=this.NIL,x=this.raiz;
     while(x!==this.NIL){pai=x;const c=this.cmp(k,x.chave);if(c===0)throw new Error("Chave já existe.");x=c<0?x.esquerda:x.direita;}
@@ -60,10 +62,11 @@ export class ArvoreRubroNegra {
   tamanho(){return this.quantidade;} esta_vazia(){return this.quantidade===0;}
   limpar(){this.raiz=this.NIL;this.quantidade=0;}
   validar(){
-    if(this.raiz===this.NIL)return true;if(this.raiz.cor!==PRETO)return false;
-    const check=(n,min,max)=>{if(n===this.NIL)return 1;if((min&&this.cmp(n.chave,min)<=0)||(max&&this.cmp(n.chave,max)>=0))return -1;
+    if(this.raiz===this.NIL)return this.quantidade===0;if(this.raiz.cor!==PRETO)return false;
+    let totalNos=0;
+    const check=(n,min,max)=>{if(n===this.NIL)return 1;totalNos++;if((min&&this.cmp(n.chave,min)<=0)||(max&&this.cmp(n.chave,max)>=0))return -1;
       if(n.cor===VERMELHO&&(n.esquerda.cor===VERMELHO||n.direita.cor===VERMELHO))return -1;
       const a=check(n.esquerda,min,n.chave),b=check(n.direita,n.chave,max);if(a<0||b<0||a!==b)return -1;return a+(n.cor===PRETO?1:0);};
-    return check(this.raiz,null,null)!==-1;
+    return check(this.raiz,null,null)!==-1&&totalNos===this.quantidade;
   }
 }
