@@ -130,6 +130,32 @@ function ativarAba(nome){
   });
 }
 
+function renderizarPreviaChamada(proximoPaciente,proximoMedico){
+  const btn=$("btnChamar");
+  const banner=$("previaChamada");
+  const podeChamar=Boolean(proximoPaciente&&proximoMedico);
+  btn.disabled=!podeChamar;
+  if(podeChamar){
+    btn.title=`Chamar ${proximoPaciente.nome} para atendimento com Dr(a). ${proximoMedico.nome}`;
+    banner.className="previa-chamada pronta";
+    banner.innerHTML=`<span>Próximo da fila:</span> <strong>${escapar(proximoPaciente.nome)}</strong> <span class="tag prioridade-${Number(proximoPaciente.prioridade)}">P${Number(proximoPaciente.prioridade)}</span> <span>&rarr;</span> <strong>Dr(a). ${escapar(proximoMedico.nome)}</strong> <small>(${proximoMedico.atendimentos} ${proximoMedico.atendimentos===1?"atendimento":"atendimentos"})</small>`;
+    return;
+  }
+  if(!proximoPaciente&&!proximoMedico){
+    btn.title="Aguardando paciente na fila e médico disponível.";
+    banner.className="previa-chamada";
+    banner.textContent="Nenhum paciente aguardando e nenhum médico disponível no momento.";
+  }else if(!proximoPaciente){
+    btn.title="Não há pacientes aguardando na fila.";
+    banner.className="previa-chamada";
+    banner.innerHTML=`Nenhum paciente aguardando na fila. Próximo médico da escala: <strong>Dr(a). ${escapar(proximoMedico.nome)}</strong>.`;
+  }else{
+    btn.title="Não há médicos disponíveis no momento.";
+    banner.className="previa-chamada alerta";
+    banner.innerHTML=`<span>Próximo paciente:</span> <strong>${escapar(proximoPaciente.nome)}</strong> <span class="tag prioridade-${Number(proximoPaciente.prioridade)}">P${Number(proximoPaciente.prioridade)}</span> <span>— aguardando médico disponível.</span>`;
+  }
+}
+
 function renderizar(){
   const fila=servicoPacientes.listar_fila_prioridade();
   const pacientes=servicoPacientes.listar_pacientes();
@@ -144,6 +170,7 @@ function renderizar(){
   $("badgeAbaAtendimento").textContent=fila.length+andamento.length;
   $("badgeAbaMedicos").textContent=`${disponiveis.length}/${medicos.length}`;
   $("badgeAbaHistorico").textContent=pacientes.length;
+  renderizarPreviaChamada(servicoPacientes.heap.consultar_proximo(),servicoAtendimentos.heapMedicos.consultar_proximo());
   $("tabelaFila").innerHTML=fila.length?fila.map((p,i)=>`<tr><td>${i+1}</td><td>${escapar(p.id)}</td><td>${escapar(p.nome)}</td><td>${p.idade}</td><td>${selectPrioridade(p)}</td><td>${dataHora(p.data_cadastro)}</td><td><button class="acao" data-cancelar="${escapar(p.id)}">Cancelar</button></td></tr>`).join(""):linhaVazia(7,"Nenhum paciente aguardando.");
   $("tabelaMedicos").innerHTML=medicos.map(m=>{
     const emAtendimento=medicosEmAtendimento.has(String(m.id));

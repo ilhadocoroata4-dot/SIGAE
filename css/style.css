@@ -38,6 +38,9 @@ button.secundario,.acao.secundario{background:#e7edf5;color:#173b67}
 .card-busca{background:#f8fafc;border:1px solid #dce5f0;border-radius:8px;padding:12px 14px;font-size:13px;line-height:1.6}
 .card-busca.vazio-busca{color:#667085}
 .linha-titulo{display:flex;justify-content:space-between;align-items:center;gap:12px}.linha-titulo h2{margin:0 0 14px}
+.previa-chamada{margin:0 0 14px;padding:10px 14px;border-radius:8px;font-size:13px;line-height:1.5;border:1px solid #dce5f0;background:#f8fafc;color:#475467;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.previa-chamada.pronta{background:#eef6ff;border-color:#bfd9f8;color:#173b67}
+.previa-chamada.alerta{background:#fff8eb;border-color:#f3dc91;color:#854d0e}
 .tabela-wrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse;min-width:620px}
 th,td{text-align:left;padding:12px 10px;border-bottom:1px solid #edf0f4;font-size:13px}
