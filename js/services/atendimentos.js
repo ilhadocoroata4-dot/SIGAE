@@ -18,15 +18,15 @@ export class ServicoAtendimentos {
     if(servicoPacientes.heap.esta_vazio())throw new Error("Não há pacientes aguardando.");
     if(this.heapMedicos.esta_vazio())throw new Error("Não há médicos disponíveis.");
     const paciente=servicoPacientes.heap.consultar_proximo();
-    const medico=this.heapMedicos.consultar_proximo();
     servicoPacientes.marcar_em_atendimento(paciente);
-    this.heapMedicos.remover_proximo();
+    const medico=this.heapMedicos.remover_proximo();
     const atendimento={id:this.proximoAtendimento++,paciente,medico,data_inicio:new Date().toISOString(),status:"Em andamento"};
     this.emAndamento.set(atendimento.id,atendimento);return atendimento;
   }
   concluir_atendimento(id){
     const atendimento=this.emAndamento.get(Number(id));if(!atendimento)throw new Error("Atendimento não encontrado.");
     atendimento.data_fim=new Date().toISOString();atendimento.status="Concluído";
+    servicoPacientes.marcar_concluido(atendimento.paciente);
     this.heapMedicos.atualizar_atendimentos(atendimento.medico.id,1);
     this.heapMedicos.atualizar_disponibilidade(atendimento.medico.id,true);
     atendimento.medico=this.heapMedicos.buscar(atendimento.medico.id);

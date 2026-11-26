@@ -20,9 +20,10 @@ export class TabelaHash {
     const bucket=this.tabela[this.funcaoHash(id)],i=bucket.findIndex(p=>this.obterId(p)===String(id));
     if(i<0)return null;this.quantidade--;return bucket.splice(i,1)[0];
   }
-  atualizar(id,dados){const p=this.buscar(id);if(!p)return false;if(dados.id!=null&&String(dados.id)!==String(id))throw new Error("Não é permitido alterar o ID.");Object.assign(p,dados);return true;}
+  atualizar(id,dados){if(!dados||typeof dados!=="object")throw new Error("Dados inválidos para atualização.");const p=this.buscar(id);if(!p)return false;if(dados.id!=null&&String(dados.id)!==String(id))throw new Error("Não é permitido alterar o ID.");Object.assign(p,dados);return true;}
   listar(){return this.tabela.flat();}
   redimensionar(nova=this.capacidade*2){
+    if(!Number.isInteger(nova)||nova<1)throw new Error("Capacidade inválida.");
     const itens=this.listar();this.capacidade=Math.max(this.capacidade+1,nova);
     this.tabela=Array.from({length:this.capacidade},()=>[]);
     for(const p of itens)this.tabela[this.funcaoHash(p.id)].push(p);

@@ -18,14 +18,21 @@ export class ServicoPacientes {
   reclassificar_paciente(id,nova){
     const p=this.tabela.buscar(id);if(!p)throw new Error("Paciente não encontrado.");
     if(p.status!=="Aguardando")throw new Error("Só é possível reclassificar paciente aguardando.");
-    this.heap.atualizar_prioridade(id,Number(nova));return p;
+    this.heap.atualizar_prioridade(id,nova);return p;
   }
   cancelar_paciente(id){
     const p=this.tabela.buscar(id);if(!p)throw new Error("Paciente não encontrado.");
     if(p.status!=="Aguardando")throw new Error("Só é possível cancelar paciente aguardando.");
-    this.heap.remover(id);this.arvore.remover(id);this.tabela.remover(id);p.status="Cancelado";return p;
+    this.heap.remover(id);this.arvore.remover(p.id);this.tabela.remover(id);p.status="Cancelado";return p;
   }
-  marcar_em_atendimento(p){this.heap.remover(p.id);this.arvore.remover(p.id);p.status="Em atendimento";}
+  marcar_em_atendimento(p){
+    if(!p||p.status!=="Aguardando")throw new Error("Paciente não está aguardando.");
+    this.heap.remover(p.id);p.status="Em atendimento";
+  }
+  marcar_concluido(p){
+    if(!p||p.status!=="Em atendimento")throw new Error("Paciente não está em atendimento.");
+    p.status="Concluído";
+  }
   validar_estruturas(){return this.arvore.validar()&&this.heap.validar()&&this.tabela.validar();}
 }
 export const servicoPacientes=new ServicoPacientes();
