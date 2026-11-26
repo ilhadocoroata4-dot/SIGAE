@@ -12,13 +12,32 @@ const PRIORIDADES=[
   [4,"4 - Pouco urgente"],
   [5,"5 - Não urgente"]
 ];
+const PRIORIDADES_MAP=new Map(PRIORIDADES);
+const STATUS_CLASSES={
+  "Aguardando":"status-aguardando",
+  "Em atendimento":"status-atendimento",
+  "Concluído":"status-concluido",
+  "Cancelado":"status-cancelado"
+};
 let idBuscaAtual="";
 
 function mensagem(txt,erro=false){$("mensagem").textContent=txt;$("mensagem").style.color=erro?"#b42318":"#1769aa";}
 function linhaVazia(colunas,txt){return `<tr><td colspan="${colunas}" class="vazio">${txt}</td></tr>`;}
+function tagPrioridade(prioridade){
+  const n=Number(prioridade);
+  const rotulo=PRIORIDADES_MAP.get(n)??`Prioridade ${n}`;
+  const classe=PRIORIDADES_MAP.has(n)?`prioridade-${n}`:"";
+  return `<span class="tag ${classe}">${escapar(rotulo)}</span>`;
+}
+function tagStatus(status){
+  const classe=STATUS_CLASSES[status]??"";
+  return `<span class="tag ${classe}">${escapar(status)}</span>`;
+}
 function selectPrioridade(p){
-  const opcoes=PRIORIDADES.map(([valor,rotulo])=>`<option value="${valor}"${Number(p.prioridade)===valor?" selected":""}>${rotulo}</option>`).join("");
-  return `<select class="select-prioridade" data-reclassificar="${escapar(p.id)}" aria-label="Prioridade de ${escapar(p.nome)}">${opcoes}</select>`;
+  const n=Number(p.prioridade);
+  const classePrio=PRIORIDADES_MAP.has(n)?`prioridade-${n}`:"";
+  const opcoes=PRIORIDADES.map(([valor,rotulo])=>`<option value="${valor}"${n===valor?" selected":""}>${rotulo}</option>`).join("");
+  return `<select class="select-prioridade ${classePrio}" data-reclassificar="${escapar(p.id)}" aria-label="Prioridade de ${escapar(p.nome)}">${opcoes}</select>`;
 }
 
 function renderizarBusca(){
@@ -31,7 +50,7 @@ function renderizarBusca(){
     host.innerHTML=`<div class="card-busca vazio-busca">Nenhum paciente encontrado com ID <strong>${escapar(idBuscaAtual)}</strong>. Consulta na Tabela Hash: ${escapar(textoBucket)}.</div>`;
     return;
   }
-  host.innerHTML=`<div class="card-busca"><strong>${escapar(paciente.nome)}</strong> (ID ${escapar(paciente.id)}) • Idade: ${paciente.idade} • Prioridade: ${paciente.prioridade} • Status: <span class="tag">${escapar(paciente.status)}</span> • Cadastro: ${dataHora(paciente.data_cadastro)}<br><small>Tabela Hash: ${escapar(textoBucket)}</small></div>`;
+  host.innerHTML=`<div class="card-busca"><strong>${escapar(paciente.nome)}</strong> (ID ${escapar(paciente.id)}) • Idade: ${paciente.idade} • ${tagPrioridade(paciente.prioridade)} • ${tagStatus(paciente.status)} • Cadastro: ${dataHora(paciente.data_cadastro)}<br><small>Tabela Hash: ${escapar(textoBucket)}</small></div>`;
 }
 
 function renderizarArvore(){
@@ -111,7 +130,7 @@ function renderizar(){
   $("tabelaFila").innerHTML=fila.length?fila.map((p,i)=>`<tr><td>${i+1}</td><td>${escapar(p.id)}</td><td>${escapar(p.nome)}</td><td>${p.idade}</td><td>${selectPrioridade(p)}</td><td>${dataHora(p.data_cadastro)}</td><td><button class="acao" data-cancelar="${escapar(p.id)}">Cancelar</button></td></tr>`).join(""):linhaVazia(7,"Nenhum paciente aguardando.");
   $("tabelaMedicos").innerHTML=medicos.map(m=>{
     const emAtendimento=medicosEmAtendimento.has(String(m.id));
-    const classeTag=m.disponivel?"ok":(emAtendimento?"":"off");
+    const classeTag=m.disponivel?"ok":(emAtendimento?"status-atendimento":"off");
     const rotuloTag=m.disponivel?"Disponível":(emAtendimento?"Em atendimento":"Ausente");
     const botao=emAtendimento
       ? `<button class="acao" disabled>Ocupado</button>`
@@ -120,7 +139,7 @@ function renderizar(){
   }).join("");
   $("tabelaAndamento").innerHTML=andamento.length?andamento.map(a=>`<tr><td>${a.id}</td><td>${escapar(a.paciente.nome)}</td><td>${escapar(a.medico.nome)}</td><td>${dataHora(a.data_inicio)}</td><td><button class="acao" data-concluir="${a.id}">Concluir</button></td></tr>`).join(""):linhaVazia(5,"Nenhum atendimento em andamento.");
   $("tabelaHistorico").innerHTML=historico.length?historico.map(a=>`<tr><td>${a.id}</td><td>${escapar(a.paciente.nome)}</td><td>${escapar(a.medico.nome)}</td><td>${dataHora(a.data_inicio)}</td><td>${dataHora(a.data_fim)}</td></tr>`).join(""):linhaVazia(5,"Nenhum atendimento concluído.");
-  $("tabelaPacientes").innerHTML=pacientes.length?pacientes.map(p=>`<tr><td>${escapar(p.id)}</td><td>${escapar(p.nome)}</td><td>${p.prioridade}</td><td>${escapar(p.status)}</td><td>${dataHora(p.data_cadastro)}</td></tr>`).join(""):linhaVazia(5,"Nenhum paciente cadastrado.");
+  $("tabelaPacientes").innerHTML=pacientes.length?pacientes.map(p=>`<tr><td>${escapar(p.id)}</td><td>${escapar(p.nome)}</td><td>${tagPrioridade(p.prioridade)}</td><td>${tagStatus(p.status)}</td><td>${dataHora(p.data_cadastro)}</td></tr>`).join(""):linhaVazia(5,"Nenhum paciente cadastrado.");
   renderizarBusca();
   renderizarArvore();
 }
