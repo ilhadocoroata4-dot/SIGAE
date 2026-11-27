@@ -25,6 +25,7 @@ export class ServicoAtendimentos {
     }
     return this.heapMedicos.inserir({id:idMedico,nome,atendimentos:0});
   }
+  buscar_medicos(termo){return this.heapMedicos.buscar_por_nome_ou_id(termo);}
   alternar_disponibilidade_medico(id){
     const medico=this.heapMedicos.buscar(id);
     if(!medico)throw new Error("Médico não encontrado.");

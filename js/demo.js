@@ -12,11 +12,20 @@ export function carregarCenarioExemplo(servPac = servicoPacientes, servAtend = s
     ["João Pedro Lima", 54, 4],
     ["Fernanda Costa", 21, 5],
     ["Roberto Almeida", 76, 1],
-    ["Juliana Martins", 37, 3]
+    ["Juliana Martins", 37, 3],
+    ["Beatriz Ramos", 33, 2],
+    ["Rafael Santos", 61, 4],
+    ["Camila Ferreira", 19, 5],
+    ["Lucas Mendes", 48, 2],
+    ["Patrícia Gomes", 72, 1]
   ];
 
   for (const [nome, idade, prioridade] of pacientesIniciais) {
     servPac.cadastrar_paciente(nome, idade, prioridade);
+  }
+
+  for (const nome of ["Beatriz", "Gustavo", "Larissa", "Felipe"]) {
+    servAtend.cadastrar_medico(nome);
   }
 
   // Simula 1 atendimento concluído e 1 em andamento para popular todas as estruturas.

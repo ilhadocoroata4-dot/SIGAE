@@ -6,6 +6,7 @@
   <title>SIGAE - Gestão de Atendimento</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
   <header class="topo">
     <div>
@@ -46,9 +47,9 @@
       </section>
 
       <section class="painel">
-        <h2>Consultar paciente por ID (Tabela Hash)</h2>
+        <h2>Consultar paciente (ID ou nome)</h2>
         <form id="formBuscaPaciente" class="form-linha">
-          <label>ID do paciente<input id="buscaIdPaciente" placeholder="Ex.: 1" required></label>
+          <label>ID ou nome do paciente<input id="buscaIdPaciente" placeholder="Ex.: Maria ou 1" required></label>
           <button type="submit">Buscar</button>
           <button type="button" id="btnLimparBusca" class="secundario">Limpar</button>
         </form>
@@ -104,6 +105,12 @@
           <label>Nome do médico<input id="nomeMedico" placeholder="Ex.: Dra. Beatriz" required maxlength="80"></label>
           <button type="submit">Cadastrar médico</button>
         </form>
+        <form id="formBuscaMedico" class="form-linha">
+          <label>ID ou nome do médico<input id="buscaMedico" placeholder="Ex.: Ana ou 104"></label>
+          <button type="submit">Buscar médico</button>
+          <button type="button" id="btnLimparBuscaMedico" class="secundario">Limpar</button>
+        </form>
+        <div id="resultadoBuscaMedico" class="resultado-busca" aria-live="polite"></div>
         <div class="tabela-wrap">
           <table>
             <thead><tr><th>ID</th><th>Médico</th><th>Atendimentos concluídos</th><th>Disponibilidade</th><th>Ação</th></tr></thead>

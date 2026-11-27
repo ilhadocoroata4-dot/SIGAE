@@ -13,6 +13,13 @@ export class ServicoPacientes {
     this.arvore.inserir(paciente);this.heap.inserir(paciente);this.tabela.inserir(paciente);return paciente;
   }
   consultar_paciente(id){return this.tabela.buscar(id);}
+  buscar_pacientes(termo){
+    const consulta=String(termo??"").trim().toLocaleLowerCase("pt-BR");
+    if(!consulta)return [];
+    return this.listar_pacientes().filter(p=>
+      String(p.id).includes(consulta)||String(p.nome).toLocaleLowerCase("pt-BR").includes(consulta)
+    );
+  }
   obter_bucket_hash(id){
     const idStr=String(id??"").trim();
     if(!idStr)return null;

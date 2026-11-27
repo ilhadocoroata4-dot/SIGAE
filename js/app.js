@@ -27,6 +27,7 @@ const STATUS_CLASSES={
   "Cancelado":"status-cancelado"
 };
 let idBuscaAtual="";
+let buscaMedicoAtual="";
 let timerToast=null;
 
 function fecharMensagem(){
@@ -67,14 +68,33 @@ function selectPrioridade(p){
 function renderizarBusca(){
   const host=$("resultadoBusca");
   if(!idBuscaAtual){host.innerHTML="";return;}
-  const paciente=servicoPacientes.consultar_paciente(idBuscaAtual);
-  const infoHash=servicoPacientes.obter_bucket_hash(idBuscaAtual);
-  const textoBucket=infoHash?`Bucket #${infoHash.bucket} de ${infoHash.capacidade} (${infoHash.itensNoBucket} ${infoHash.itensNoBucket===1?"item":"itens"} no bucket)`:"";
-  if(!paciente){
-    host.innerHTML=`<div class="card-busca vazio-busca">Nenhum paciente encontrado com ID <strong>${escapar(idBuscaAtual)}</strong>. Consulta na Tabela Hash: ${escapar(textoBucket)}.</div>`;
+  const resultados=servicoPacientes.buscar_pacientes(idBuscaAtual);
+  if(!resultados.length){
+    host.innerHTML=`<div class="card-busca vazio-busca">Nenhum paciente encontrado para <strong>${escapar(idBuscaAtual)}</strong>.</div>`;
     return;
   }
-  host.innerHTML=`<div class="card-busca"><strong>${escapar(paciente.nome)}</strong> (ID ${escapar(paciente.id)}) • Idade: ${paciente.idade} • ${tagPrioridade(paciente.prioridade)} • ${tagStatus(paciente.status)} • Cadastro: ${dataHora(paciente.data_cadastro)}<br><small>Tabela Hash: ${escapar(textoBucket)}</small></div>`;
+  host.innerHTML=resultados.map(paciente=>{
+    const infoHash=servicoPacientes.obter_bucket_hash(paciente.id);
+    const textoBucket=infoHash?`Bucket #${infoHash.bucket} de ${infoHash.capacidade}`:"";
+    return `<button type="button" class="card-busca" data-consultar-id="${escapar(paciente.id)}" style="width:100%;text-align:left;margin-bottom:8px"><strong>${escapar(paciente.nome)}</strong> (ID ${escapar(paciente.id)}) • Idade: ${paciente.idade} • ${tagPrioridade(paciente.prioridade)} • ${tagStatus(paciente.status)} • Cadastro: ${dataHora(paciente.data_cadastro)}<br><small>Tabela Hash: ${escapar(textoBucket)}</small></button>`;
+  }).join("");
+}
+
+function renderizarBuscaMedico(){
+  const host=$("resultadoBuscaMedico");
+  if(!host)return;
+  if(!buscaMedicoAtual){host.innerHTML="";return;}
+  const resultados=servicoAtendimentos.buscar_medicos(buscaMedicoAtual);
+  if(!resultados.length){
+    host.innerHTML=`<div class="card-busca vazio-busca">Nenhum médico encontrado para <strong>${escapar(buscaMedicoAtual)}</strong>.</div>`;
+    return;
+  }
+  host.innerHTML=resultados.map(m=>{
+    const emAtendimento=servicoAtendimentos.listar_em_andamento().some(a=>String(a.medico.id)===String(m.id));
+    const status=m.disponivel?"Disponível":(emAtendimento?"Em atendimento":"Ausente");
+    const classe=m.disponivel?"status-concluido":(emAtendimento?"status-atendimento":"status-cancelado");
+    return `<div class="card-busca"><strong>${escapar(m.nome)}</strong> (ID ${escapar(m.id)}) • ${m.atendimentos} ${m.atendimentos===1?"atendimento":"atendimentos"} • <span class="tag ${classe}">${status}</span></div>`;
+  }).join("");
 }
 
 function renderizarEstruturas(){
@@ -176,6 +196,7 @@ function renderizar(){
   $("tabelaHistorico").innerHTML=historico.length?historico.map(a=>`<tr><td>${a.id}</td><td>${escapar(a.paciente.nome)} <span class="tag prioridade-${Number(a.paciente.prioridade)}">P${Number(a.paciente.prioridade)}</span></td><td>${escapar(a.medico.nome)}</td><td>${dataHora(a.data_inicio)}</td><td>${dataHora(a.data_fim)}</td></tr>`).join(""):linhaVazia(5,"Nenhum atendimento concluído.");
   $("tabelaPacientes").innerHTML=pacientes.length?pacientes.map(p=>`<tr><td>${escapar(p.id)}</td><td>${escapar(p.nome)}</td><td>${tagPrioridade(p.prioridade)}</td><td>${tagStatus(p.status)}</td><td>${dataHora(p.data_cadastro)}</td></tr>`).join(""):linhaVazia(5,"Nenhum paciente cadastrado.");
   renderizarBusca();
+  renderizarBuscaMedico();
   renderizarEstruturas();
 }
 
@@ -207,6 +228,16 @@ $("formMedico").addEventListener("submit",e=>{
     salvarEstado(servicoPacientes,servicoAtendimentos);
     e.target.reset();renderizar();mensagem(`Médico(a) ${m.nome} cadastrado(a) com ID ${m.id}.`);
   }catch(err){mensagem(err.message,true);}
+});
+$("formBuscaMedico").addEventListener("submit",e=>{
+  e.preventDefault();
+  buscaMedicoAtual=$("buscaMedico").value.trim();
+  renderizarBuscaMedico();
+});
+$("btnLimparBuscaMedico").addEventListener("click",()=>{
+  buscaMedicoAtual="";
+  $("buscaMedico").value="";
+  renderizarBuscaMedico();
 });
 $("btnChamar").addEventListener("click",()=>{
   try{const a=servicoAtendimentos.chamar_proximo();salvarEstado(servicoPacientes,servicoAtendimentos);renderizar();mensagem(`${a.paciente.nome} chamado(a) pelo(a) Dr(a). ${a.medico.nome}.`);}

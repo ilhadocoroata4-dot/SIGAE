@@ -22,6 +22,13 @@ export class HeapMedicos {
   }
   adicionarHeap(m){const id=String(m.id);if(this.posicoes.has(id))return;this.heap.push(m);let i=this.heap.length-1;this.posicoes.set(id,i);this.subir(i);}
   buscar(id){return this.medicos.get(String(id))??null;}
+  buscar_por_nome_ou_id(termo){
+    const consulta=String(termo??"").trim().toLocaleLowerCase("pt-BR");
+    if(!consulta)return [];
+    return this.listar_todos().filter(m=>
+      String(m.id).includes(consulta)||String(m.nome).toLocaleLowerCase("pt-BR").includes(consulta)
+    );
+  }
   consultar_proximo(){return this.heap[0]??null;}
   removerIndice(i){
     const m=this.heap[i],id=String(m.id),u=this.heap.pop();this.posicoes.delete(id);

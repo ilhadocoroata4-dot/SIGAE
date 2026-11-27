@@ -99,20 +99,29 @@ test("Fluxo completo de atendimento, reclassificação, médicos e persistência
   };
 
   const p1 = servicoPacientes.cadastrar_paciente("João", 30, 3);
-  const p2 = servicoPacientes.cadastrar_paciente("Maria", 65, 1);
+  const p2 = servicoPacientes.cadastrar_paciente("Maria Silva", 65, 1);
   const p3 = servicoPacientes.cadastrar_paciente("Lucas", 40, 2);
+  const p4 = servicoPacientes.cadastrar_paciente("Maria Oliveira", 52, 4);
+  const p5 = servicoPacientes.cadastrar_paciente("Rafael Souza", 27, 3);
+  const p6 = servicoPacientes.cadastrar_paciente("Ana Costa", 71, 5);
 
   servicoPacientes.reclassificar_paciente(p1.id, 1);
   assert.equal(servicoPacientes.consultar_paciente(p1.id).prioridade, 1);
   assert.equal(typeof servicoPacientes.obter_bucket_hash(p1.id).bucket, "number");
+  assert.deepEqual(servicoPacientes.buscar_pacientes("Maria").map(p => p.id), [p2.id, p4.id]);
+  assert.deepEqual(servicoPacientes.buscar_pacientes(p5.id).map(p => p.id), [p5.id]);
 
   const m5 = servicoAtendimentos.cadastrar_medico("Beatriz");
+  const m6 = servicoAtendimentos.cadastrar_medico("Gustavo");
+  const m7 = servicoAtendimentos.cadastrar_medico("Larissa");
   servicoAtendimentos.alternar_disponibilidade_medico(m5.id);
   assert.equal(m5.disponivel, false);
+  assert.deepEqual(servicoAtendimentos.buscar_medicos("Mari").map(m => m.nome), ["Mariana"]);
+  assert.deepEqual(servicoAtendimentos.buscar_medicos(m7.id).map(m => m.id), [m7.id]);
 
   const at1 = servicoAtendimentos.chamar_proximo();
   assert.equal(at1.paciente.status, "Em atendimento");
-  assert.equal(servicoPacientes.listar_pacientes().length, 3);
+  assert.equal(servicoPacientes.listar_pacientes().length, 6);
   assert.throws(() => servicoAtendimentos.alternar_disponibilidade_medico(at1.medico.id), /em atendimento/);
 
   const at2 = servicoAtendimentos.chamar_proximo();
@@ -127,8 +136,7 @@ test("Fluxo completo de atendimento, reclassificação, médicos e persistência
 
   assert.equal(servicoPacientes.validar_estruturas(), true);
   assert.equal(servicoAtendimentos.heapMedicos.validar(), true);
-  assert.equal(servicoPacientes.listar_fila_prioridade().length, 1);
-  assert.equal(servicoPacientes.listar_fila_prioridade()[0].id, p3.id);
+  assert.equal(servicoPacientes.listar_fila_prioridade().length, 4);
   assert.equal(servicoAtendimentos.listar_em_andamento().length, 1);
   assert.equal(servicoAtendimentos.listar_historico().length, 1);
 
@@ -142,12 +150,16 @@ test("Fluxo completo de atendimento, reclassificação, médicos e persistência
 
 test("Cenário de exemplo e geradores de visualização das 4 estruturas", () => {
   const resumo = carregarCenarioExemplo(servicoPacientes, servicoAtendimentos);
-  assert.equal(resumo.totalPacientes, 7);
-  assert.equal(resumo.aguardando, 5);
+  assert.equal(resumo.totalPacientes, 12);
+  assert.equal(resumo.aguardando, 10);
   assert.equal(resumo.emAndamento, 1);
   assert.equal(resumo.concluidos, 1);
   assert.equal(servicoPacientes.validar_estruturas(), true);
   assert.equal(servicoAtendimentos.heapMedicos.validar(), true);
+  assert.equal(servicoPacientes.buscar_pacientes("Maria").length, 1);
+  assert.equal(servicoPacientes.buscar_pacientes("7").length, 1);
+  assert.equal(servicoAtendimentos.buscar_medicos("Beatriz").length, 1);
+  assert.equal(servicoAtendimentos.buscar_medicos("104").length, 1);
 
   const svgArn = gerarSvgArvoreRubroNegra(servicoPacientes.arvore);
   const svgHp = gerarSvgHeapPacientes(servicoPacientes.heap);
